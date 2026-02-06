@@ -1,0 +1,80 @@
+=====================================
+INTERVIEW INSIGHT - QUICK START
+=====================================
+
+STEP 1: Get Your API Key
+-------------------------
+Go to: https://aistudio.google.com/app/apikey
+Click "Create API Key"
+Copy the key
+
+STEP 2: Set Up the App
+-----------------------
+1. Extract this folder somewhere on your computer
+2. Open Terminal (Mac) or Command Prompt (Windows)
+3. Navigate to this folder:
+   cd path/to/interview-insight
+4. Copy the env file:
+   cp .env.example .env.local
+5. Edit .env.local and paste your API key after GEMINI_API_KEY=
+
+STEP 3: Install Dependencies
+-----------------------------
+npm install
+
+(This downloads required packages - takes 1-2 minutes)
+
+STEP 4: Test It Locally
+------------------------
+npm run dev
+
+Open http://localhost:3000 in your browser
+Try uploading a small audio file
+Press Ctrl+C to stop when done
+
+STEP 5: Deploy to Netlify
+--------------------------
+EASY WAY:
+1. Run: npm run build
+2. Go to: https://app.netlify.com/drop
+3. Drag the 'dist' folder to the page
+4. After upload, go to Site Settings → Environment Variables
+5. Add variable:
+   - Name: GEMINI_API_KEY
+   - Value: (paste your API key)
+6. Go to Deploys → Trigger deploy → Clear cache and deploy site
+7. Done! Your site is live
+
+WITH CLI:
+1. npm install -g netlify-cli
+2. npm run build
+3. netlify deploy --prod
+4. Follow prompts, use 'dist' as publish directory
+5. Add API key: netlify env:set GEMINI_API_KEY "your_key"
+6. netlify deploy --prod
+7. Done!
+
+TROUBLESHOOTING
+---------------
+Blank screen after deploy?
+→ Check that GEMINI_API_KEY is set in Netlify environment variables
+
+Build fails?
+→ Make sure npm install completed successfully
+→ Try: rm -rf node_modules package-lock.json && npm install
+
+Still having issues?
+→ See DEPLOYMENT_GUIDE.md for detailed troubleshooting
+
+IMPORTANT NOTES
+---------------
+- Your API key gets built into the app
+- Keep your Netlify URL private or add password protection
+- Monitor API usage at https://aistudio.google.com/
+
+For detailed instructions, see:
+- README.md - Full documentation
+- DEPLOYMENT_GUIDE.md - Step-by-step deployment guide
+
+OR use the interactive script:
+./start.sh

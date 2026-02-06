@@ -1,0 +1,5 @@
+{
+  "name": "Interview Insight",
+  "description": "Upload audio or video interviews to automatically generate accurate English transcripts and translations using Gemini 3 Pro.",
+  "requestFramePermissions": []
+}
