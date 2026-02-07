@@ -443,6 +443,12 @@ export function flushPendingWrites(): void {
   pendingWrites = new Map();
 }
 
+// Register beforeunload listener to flush pending writes on tab close.
+// Guarded for SSR safety (not applicable now, but future-proof).
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', flushPendingWrites);
+}
+
 // --- Project CRUD ---
 
 /**
@@ -578,4 +584,56 @@ export function saveTranscript(data: TranscriptData): WriteResult {
 export function deleteTranscript(projectId: string): void {
   localStorage.removeItem(STORAGE_KEYS.transcript(projectId));
   console.log(`${LOG_PREFIX} Deleted transcript for project ${projectId}`);
+}
+
+// --- Orphan cleanup ---
+
+const TRANSCRIPT_KEY_PREFIX = 'ii:transcript:';
+
+/**
+ * Find and remove transcript keys that have no corresponding project.
+ * This handles edge cases where a project was deleted but the transcript
+ * key was not cleaned up (e.g., due to a crash or code bug).
+ * Returns the number of orphaned keys removed.
+ */
+export function cleanupOrphanedTranscripts(): number {
+  const projectIds = new Set(getProjects().map((p) => p.id));
+  let removedCount = 0;
+
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key !== null && key.startsWith(TRANSCRIPT_KEY_PREFIX)) {
+      const transcriptProjectId = key.slice(TRANSCRIPT_KEY_PREFIX.length);
+      if (!projectIds.has(transcriptProjectId)) {
+        localStorage.removeItem(key);
+        removedCount++;
+      }
+    }
+  }
+
+  if (removedCount > 0) {
+    console.log(
+      `${LOG_PREFIX} Cleaned up ${removedCount} orphaned transcript(s)`
+    );
+  }
+
+  return removedCount;
+}
+
+// --- Storage reporting ---
+
+/**
+ * Get a summary of storage usage for dashboard/settings UI.
+ * Combines usage metrics, project count, and availability status.
+ */
+export function getStorageReport(): {
+  usageMB: number;
+  projectCount: number;
+  available: boolean;
+} {
+  return {
+    usageMB: getStorageUsageMB(),
+    projectCount: getProjects().length,
+    available: isStorageAvailable(),
+  };
 }
