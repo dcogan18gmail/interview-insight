@@ -63,18 +63,18 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Code Quality
 
-- [ ] **QUAL-01**: ESLint 9 (flat config) with TypeScript, React, React Hooks, and accessibility plugins
-- [ ] **QUAL-02**: Prettier with Tailwind plugin configured
-- [ ] **QUAL-03**: Pre-commit hooks via Husky + lint-staged (lint + format on commit)
-- [ ] **QUAL-04**: TypeScript strict mode enabled (strict, noUncheckedIndexedAccess)
-- [ ] **QUAL-05**: All dependencies pinned to specific versions (no "latest")
+- [x] **QUAL-01**: ESLint 9 (flat config) with TypeScript, React, React Hooks, and accessibility plugins
+- [x] **QUAL-02**: Prettier with Tailwind plugin configured
+- [x] **QUAL-03**: Pre-commit hooks via Husky + lint-staged (lint + format on commit)
+- [x] **QUAL-04**: TypeScript strict mode enabled (strict, noUncheckedIndexedAccess)
+- [x] **QUAL-05**: All dependencies pinned to specific versions (no "latest")
 - [ ] **QUAL-06**: Vitest configured with React Testing Library
 - [ ] **QUAL-07**: Tests for critical logic: JSONL parser, deduplication, storage service, crypto
 - [ ] **QUAL-08**: Tests for key components: ApiKeyForm, ProjectDashboard
 
 ### Deployment & Infrastructure
 
-- [ ] **DEPL-01**: GitHub Actions CI pipeline (lint, type-check, test, build on PR)
+- [x] **DEPL-01**: GitHub Actions CI pipeline (lint, type-check, test, build on PR)
 - [ ] **DEPL-02**: Netlify auto-deploy on merge to main
 - [ ] **DEPL-03**: Custom domain configured and pointing to Netlify
 - [ ] **DEPL-04**: SPA redirect configured in netlify.toml (/\* → /index.html)
@@ -169,15 +169,15 @@ Deferred to future release. Tracked but not in current roadmap.
 | UX-05       | Phase 7 | Pending  |
 | UX-06       | Phase 7 | Pending  |
 | UX-07       | Phase 7 | Pending  |
-| QUAL-01     | Phase 2 | Pending  |
-| QUAL-02     | Phase 2 | Pending  |
-| QUAL-03     | Phase 2 | Pending  |
-| QUAL-04     | Phase 2 | Pending  |
-| QUAL-05     | Phase 2 | Pending  |
+| QUAL-01     | Phase 2 | Complete |
+| QUAL-02     | Phase 2 | Complete |
+| QUAL-03     | Phase 2 | Complete |
+| QUAL-04     | Phase 2 | Complete |
+| QUAL-05     | Phase 2 | Complete |
 | QUAL-06     | Phase 8 | Pending  |
 | QUAL-07     | Phase 8 | Pending  |
 | QUAL-08     | Phase 8 | Pending  |
-| DEPL-01     | Phase 2 | Pending  |
+| DEPL-01     | Phase 2 | Complete |
 | DEPL-02     | Phase 9 | Pending  |
 | DEPL-03     | Phase 9 | Pending  |
 | DEPL-04     | Phase 9 | Pending  |
@@ -195,4 +195,4 @@ Deferred to future release. Tracked but not in current roadmap.
 ---
 
 _Requirements defined: 2026-02-06_
-_Last updated: 2026-02-07 after Phase 1 completion_
+_Last updated: 2026-02-07 after Phase 2 completion_
