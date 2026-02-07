@@ -11,7 +11,18 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,html}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@google/genai": "1.30.0",
@@ -33,6 +44,8 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "globals": "17.3.0",
+    "husky": "9.1.7",
+    "lint-staged": "16.2.7",
     "netlify-cli": "23.11.1",
     "postcss": "8.5.6",
     "prettier": "3.8.1",
