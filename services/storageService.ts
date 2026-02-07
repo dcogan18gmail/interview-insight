@@ -1,5 +1,5 @@
-// Core storage primitives for localStorage persistence layer
-// Handles safe reads/writes, schema versioning, migration infrastructure, and storage metrics
+// Storage service for localStorage persistence layer
+// Provides project/transcript CRUD, debounced writes, orphan cleanup, and storage metrics
 
 import type {
   StorageMeta,
@@ -9,6 +9,7 @@ import type {
   ParseResult,
   Migration,
   ProjectStatus,
+  FileInfo,
 } from './storageService.types';
 import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION } from './storageService.types';
 
@@ -395,4 +396,186 @@ export function getStorageUsageBytes(): number {
  */
 export function getStorageUsageMB(): number {
   return Math.round((getStorageUsageBytes() / (1024 * 1024)) * 100) / 100;
+}
+
+// --- Debounced write system ---
+
+let pendingWrites: Map<string, string> = new Map();
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+const DEBOUNCE_MS = 300;
+
+/**
+ * Queue a write for debounced batching.
+ * Replaces any pending write for the same key.
+ * Flushes after DEBOUNCE_MS of inactivity.
+ */
+function debouncedWrite(key: string, value: string): void {
+  pendingWrites.set(key, value);
+
+  if (flushTimer !== null) {
+    clearTimeout(flushTimer);
+  }
+
+  flushTimer = setTimeout(flushPendingWrites, DEBOUNCE_MS);
+}
+
+/**
+ * Immediately flush all pending debounced writes to localStorage.
+ * Logs errors but does not throw (best-effort flush).
+ * Call this before navigation or on beforeunload.
+ */
+export function flushPendingWrites(): void {
+  if (flushTimer !== null) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+
+  for (const [key, value] of pendingWrites) {
+    const result = safeWrite(key, value);
+    if (!result.ok) {
+      console.error(
+        `${LOG_PREFIX} Debounced write failed for key "${key}": ${result.message}`
+      );
+    }
+  }
+
+  pendingWrites = new Map();
+}
+
+// --- Project CRUD ---
+
+/**
+ * Get all projects from storage.
+ * Returns empty array if no projects exist or data is corrupted.
+ */
+export function getProjects(): ProjectMetadata[] {
+  return safeRead(STORAGE_KEYS.PROJECTS, validateProjectMetadataArray) ?? [];
+}
+
+/**
+ * Get a single project by ID.
+ * Returns null if project not found.
+ */
+export function getProject(id: string): ProjectMetadata | null {
+  const projects = getProjects();
+  return projects.find((p) => p.id === id) ?? null;
+}
+
+/**
+ * Save (create or update) a project in the projects array.
+ * Updates the project's updatedAt timestamp.
+ * When immediate is false (default), uses debounced write for batching rapid updates.
+ * When immediate is true, writes directly and returns the real WriteResult.
+ */
+export function saveProject(
+  project: ProjectMetadata,
+  immediate = false
+): WriteResult {
+  const projects = getProjects();
+  const existingIndex = projects.findIndex((p) => p.id === project.id);
+  const updated = { ...project, updatedAt: new Date().toISOString() };
+
+  if (existingIndex >= 0) {
+    projects[existingIndex] = updated;
+  } else {
+    projects.push(updated);
+  }
+
+  const serialized = JSON.stringify(projects);
+
+  if (immediate) {
+    return safeWrite(STORAGE_KEYS.PROJECTS, serialized);
+  }
+
+  debouncedWrite(STORAGE_KEYS.PROJECTS, serialized);
+  return { ok: true };
+}
+
+/**
+ * Delete a project and its associated transcript data.
+ * Removes both the metadata entry from the projects array and the
+ * separate transcript key to prevent orphaned data.
+ */
+export function deleteProject(id: string): void {
+  const projects = getProjects();
+  const filtered = projects.filter((p) => p.id !== id);
+  safeWrite(STORAGE_KEYS.PROJECTS, JSON.stringify(filtered));
+  localStorage.removeItem(STORAGE_KEYS.transcript(id));
+  console.log(
+    `${LOG_PREFIX} Deleted project ${id} and associated transcript data`
+  );
+}
+
+/**
+ * Create a new project with a generated UUID and persist it immediately.
+ * Returns both the created project object and the WriteResult.
+ */
+export function createProject(
+  name: string,
+  fileInfo: FileInfo
+): { project: ProjectMetadata; result: WriteResult } {
+  const now = new Date().toISOString();
+  const project: ProjectMetadata = {
+    id: crypto.randomUUID(),
+    name,
+    createdAt: now,
+    updatedAt: now,
+    status: 'idle',
+    fileInfo,
+    segmentCount: 0,
+  };
+
+  const result = saveProject(project, true);
+  return { project, result };
+}
+
+// --- Transcript CRUD ---
+
+/**
+ * Get transcript data for a project.
+ * Returns null if transcript not found or data is corrupted.
+ */
+export function getTranscript(projectId: string): TranscriptData | null {
+  return safeRead(STORAGE_KEYS.transcript(projectId), validateTranscriptData);
+}
+
+/**
+ * Save transcript data and sync the parent project's segmentCount.
+ * Writes transcript to its own key and updates the project metadata
+ * to keep segmentCount in sync without loading full transcript data.
+ */
+export function saveTranscript(data: TranscriptData): WriteResult {
+  const result = safeWrite(
+    STORAGE_KEYS.transcript(data.projectId),
+    JSON.stringify(data)
+  );
+  if (!result.ok) {
+    return result;
+  }
+
+  // Sync segmentCount to project metadata
+  const projects = getProjects();
+  const projectIndex = projects.findIndex((p) => p.id === data.projectId);
+  if (projectIndex >= 0) {
+    const project = projects[projectIndex];
+    if (project) {
+      projects[projectIndex] = {
+        ...project,
+        segmentCount: data.segments.length,
+        updatedAt: new Date().toISOString(),
+      };
+      safeWrite(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Delete transcript data for a project.
+ */
+export function deleteTranscript(projectId: string): void {
+  localStorage.removeItem(STORAGE_KEYS.transcript(projectId));
+  console.log(`${LOG_PREFIX} Deleted transcript for project ${projectId}`);
 }
