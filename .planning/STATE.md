@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis — with full visibility into the process.
-**Current focus:** Phase 1 - Security Hardening
+**Current focus:** Phase 1 - Security Hardening (COMPLETE)
 
 ## Current Position
 
 Phase: 1 of 9 (Security Hardening)
-Plan: 2 of 3
-Status: In progress
-Last activity: 2026-02-07 — Completed 01-02-PLAN.md (Server-Side Security Hardening)
+Plan: 3 of 3
+Status: Phase complete
+Last activity: 2026-02-07 — Completed 01-03-PLAN.md (Client-Side BYOK Integration)
 
-Progress: [██░░░░░░░░] ~7% (2 plans of ~30+ estimated total)
+Progress: [███░░░░░░░] ~10% (3 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: ~1m 10s
-- Total execution time: ~0.04 hours
+- Total plans completed: 3
+- Average duration: ~1m 43s
+- Total execution time: ~0.09 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-security-hardening | 2/3 | ~2m 31s | ~1m 16s |
+| 01-security-hardening | 3/3 | ~5m 29s | ~1m 50s |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s)
-- Trend: Stable
+- Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s), 01-03 (2m 58s)
+- Trend: Stable (01-03 longer due to 4 files + build verification)
 
 *Updated after each plan completion*
 
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - BYOK via X-Gemini-Key request header with env var fallback: Enables per-user keys while preserving backward compat (01-02)
 - Rate limits: 100/60s for proxy-upload, 20/60s for gemini-upload (01-02)
 - Migrated gemini-upload to Netlify Functions v2 format: Required for rate limiting config (01-02)
+- Validate API key before encrypting and storing: Prevents invalid keys in storage (01-03)
+- Async createAI() replaces sync getAI() singleton: Fresh instance per transcription, supports key changes (01-03)
+- Removed loadEnv from vite.config.ts: Only used for API key injection, no longer needed (01-03)
 
 ### Pending Todos
 
@@ -60,9 +63,9 @@ None yet.
 
 ### Blockers/Concerns
 
-**Phase 1 (Security):**
+**Phase 1 (Security) -- RESOLVED:**
 - Browser extension attack surface: Malicious extensions can steal localStorage keys. This is accepted tradeoff for browser-based BYOK but should be documented in user-facing security guidance.
-- Client code must be updated to send X-Gemini-Key header and use new /api/gemini-upload endpoint (addressed in 01-03)
+- ~~Client code must be updated to send X-Gemini-Key header and use new /api/gemini-upload endpoint~~ (completed in 01-03)
 
 **Phase 3 (Storage):**
 - IndexedDB migration threshold: localStorage has ~5-10MB quota but exact limits vary by browser. Need to test with actual long transcripts to determine practical limits and migration trigger point.
@@ -72,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07T17:48:34Z
-Stopped at: Completed 01-02-PLAN.md (Server-Side Security Hardening)
+Last session: 2026-02-07T17:56:09Z
+Stopped at: Completed 01-03-PLAN.md (Client-Side BYOK Integration) -- Phase 1 complete
 Resume file: None
