@@ -1,34 +1,37 @@
 // Crypto service for BYOK API key management
 // Uses Web Crypto API exclusively — no npm dependencies
 
-const STORAGE_KEY_ENCRYPTED = "gemini_encrypted_key";
-const STORAGE_KEY_PASSPHRASE = "gemini_key_passphrase";
+const STORAGE_KEY_ENCRYPTED = 'gemini_encrypted_key';
+const STORAGE_KEY_PASSPHRASE = 'gemini_key_passphrase';
 
 /**
  * Derive an AES-GCM 256-bit key from a passphrase using PBKDF2.
  * 100,000 iterations with SHA-256.
  */
-async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
+async function deriveKey(
+  passphrase: string,
+  salt: Uint8Array
+): Promise<CryptoKey> {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
-    "raw",
+    'raw',
     encoder.encode(passphrase),
-    "PBKDF2",
+    'PBKDF2',
     false,
-    ["deriveKey"]
+    ['deriveKey']
   );
 
   return crypto.subtle.deriveKey(
     {
-      name: "PBKDF2",
+      name: 'PBKDF2',
       salt,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: 'SHA-256',
     },
     keyMaterial,
-    { name: "AES-GCM", length: 256 },
+    { name: 'AES-GCM', length: 256 },
     false,
-    ["encrypt", "decrypt"]
+    ['encrypt', 'decrypt']
   );
 }
 
@@ -37,14 +40,17 @@ async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKe
  * Returns base64-encoded string of salt(16) + iv(12) + ciphertext.
  * Fresh salt and IV are generated on every call.
  */
-export async function encryptApiKey(apiKey: string, passphrase: string): Promise<string> {
+export async function encryptApiKey(
+  apiKey: string,
+  passphrase: string
+): Promise<string> {
   const encoder = new TextEncoder();
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveKey(passphrase, salt);
 
   const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: 'AES-GCM', iv },
     key,
     encoder.encode(apiKey)
   );
@@ -62,7 +68,10 @@ export async function encryptApiKey(apiKey: string, passphrase: string): Promise
  * Decrypt an API key from base64-encoded storage format.
  * Expects salt(16) + iv(12) + ciphertext layout.
  */
-export async function decryptApiKey(storedData: string, passphrase: string): Promise<string> {
+export async function decryptApiKey(
+  storedData: string,
+  passphrase: string
+): Promise<string> {
   const raw = Uint8Array.from(atob(storedData), (c) => c.charCodeAt(0));
   const salt = raw.slice(0, 16);
   const iv = raw.slice(16, 28);
@@ -71,7 +80,7 @@ export async function decryptApiKey(storedData: string, passphrase: string): Pro
   const key = await deriveKey(passphrase, salt);
 
   const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
+    { name: 'AES-GCM', iv },
     key,
     ciphertext
   );
@@ -99,7 +108,9 @@ export function getOrCreatePassphrase(): string {
  * Validate a Gemini API key by making a lightweight request to the models endpoint.
  * Never throws — returns a result object with valid flag and optional error message.
  */
-export async function validateGeminiApiKey(apiKey: string): Promise<{ valid: boolean; error?: string }> {
+export async function validateGeminiApiKey(
+  apiKey: string
+): Promise<{ valid: boolean; error?: string }> {
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=1`
@@ -109,9 +120,12 @@ export async function validateGeminiApiKey(apiKey: string): Promise<{ valid: boo
       return { valid: true };
     }
 
-    return { valid: false, error: "Invalid API key" };
+    return { valid: false, error: 'Invalid API key' };
   } catch {
-    return { valid: false, error: "Could not validate key. Check your network connection." };
+    return {
+      valid: false,
+      error: 'Could not validate key. Check your network connection.',
+    };
   }
 }
 

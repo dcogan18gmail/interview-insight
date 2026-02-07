@@ -13,6 +13,7 @@ This guide will walk you through deploying your app to Netlify step by step.
 ### Step 1: Set Up Your API Key Locally
 
 1. Copy the example environment file:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -20,6 +21,7 @@ This guide will walk you through deploying your app to Netlify step by step.
 2. Open `.env.local` in a text editor
 
 3. Replace `your_api_key_here` with your actual Gemini API key:
+
    ```
    GEMINI_API_KEY=AIza...your_actual_key...
    ```
@@ -65,7 +67,7 @@ This creates an optimized version of your app in a folder called `dist`.
 4. You'll get a URL like `https://random-name-123.netlify.app`
 
 5. **IMPORTANT:** Add your API key:
-   - Click "Site settings" 
+   - Click "Site settings"
    - Click "Environment variables" in the left sidebar
    - Click "Add a variable"
    - Key: `GEMINI_API_KEY`
@@ -84,17 +86,21 @@ This creates an optimized version of your app in a folder called `dist`.
 #### Method B: Using the CLI (More Control)
 
 1. Install Netlify CLI globally:
+
    ```bash
    npm install -g netlify-cli
    ```
 
 2. Login to Netlify:
+
    ```bash
    netlify login
    ```
+
    This will open your browser to authenticate.
 
 3. Deploy:
+
    ```bash
    netlify deploy --prod
    ```
@@ -106,11 +112,13 @@ This creates an optimized version of your app in a folder called `dist`.
    - "Publish directory": Type `dist` and press Enter
 
 5. Add your API key:
+
    ```bash
    netlify env:set GEMINI_API_KEY "your_actual_api_key_here"
    ```
 
 6. Redeploy to apply the environment variable:
+
    ```bash
    netlify deploy --prod
    ```
@@ -122,6 +130,7 @@ This creates an optimized version of your app in a folder called `dist`.
 1. Create a repository on GitHub/GitLab/Bitbucket
 
 2. Push your code:
+
    ```bash
    git init
    git add .

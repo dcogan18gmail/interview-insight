@@ -5,14 +5,17 @@
 ## Test Framework
 
 **Runner:**
+
 - No test framework is installed or configured
 - No test runner (no Jest, Vitest, Mocha, or any other)
 - No test script in `package.json` (only `dev`, `start`, `build`, `preview`)
 
 **Assertion Library:**
+
 - None installed
 
 **Run Commands:**
+
 ```bash
 # No test commands exist. These would need to be added:
 # npm test           # Not configured
@@ -22,14 +25,17 @@
 ## Test File Organization
 
 **Location:**
+
 - No test files exist anywhere in the project source
 - No `__tests__/` directories
 - No `*.test.ts`, `*.test.tsx`, `*.spec.ts`, or `*.spec.tsx` files outside `node_modules/`
 
 **Naming:**
+
 - No convention established
 
 **Structure:**
+
 - No test directory structure exists. If tests are added, the recommended approach based on codebase structure would be:
 
 ```
@@ -47,9 +53,11 @@
 ## Test Structure
 
 **Suite Organization:**
+
 - No existing tests to reference
 
 **Recommended pattern based on codebase conventions:**
+
 ```typescript
 // Vitest recommended (already uses Vite for builds)
 import { describe, it, expect, vi } from 'vitest';
@@ -69,6 +77,7 @@ describe('FileUpload', () => {
 **Framework:** None installed
 
 **What would need mocking (based on codebase analysis):**
+
 - `@google/genai` SDK (`GoogleGenAI`, `generateContentStream`) -- used in `services/geminiService.ts`
 - `fetch` API -- used in `services/geminiService.ts` for `uploadFile` (lines 71, 102) and in `netlify/functions/gemini-upload.ts` (line 38)
 - `process.env.API_KEY` / `process.env.GEMINI_API_KEY` -- environment variables accessed in `services/geminiService.ts` line 8 and `netlify/functions/gemini-upload.ts` line 16
@@ -78,6 +87,7 @@ describe('FileUpload', () => {
 - `docx` library (`Document`, `Packer.toBlob`) -- used in `components/TranscriptView.tsx` for DOCX generation
 
 **Recommended mocking pattern:**
+
 ```typescript
 // For the Gemini AI client (services/geminiService.ts)
 vi.mock('@google/genai', () => ({
@@ -85,11 +95,13 @@ vi.mock('@google/genai', () => ({
     models: {
       generateContentStream: vi.fn().mockResolvedValue({
         [Symbol.asyncIterator]: async function* () {
-          yield { text: '{"speaker":"Guest","originalText":"Hello","englishText":"Hello","timestamp":0}\n' };
-        }
-      })
-    }
-  }))
+          yield {
+            text: '{"speaker":"Guest","originalText":"Hello","englishText":"Hello","timestamp":0}\n',
+          };
+        },
+      }),
+    },
+  })),
 }));
 
 // For fetch (upload flow)
@@ -97,13 +109,14 @@ global.fetch = vi.fn().mockResolvedValue({
   ok: true,
   json: () => Promise.resolve({ uploadUrl: 'https://example.com/upload' }),
   text: () => Promise.resolve(''),
-  headers: new Headers({ 'x-goog-upload-url': 'https://example.com/upload' })
+  headers: new Headers({ 'x-goog-upload-url': 'https://example.com/upload' }),
 });
 ```
 
 ## Fixtures and Factories
 
 **Test Data:**
+
 - No fixtures exist. Key types that would need test factories:
 
 ```typescript
@@ -119,7 +132,9 @@ const createMockFileData = (overrides?: Partial<FileData>): FileData => ({
   ...overrides,
 });
 
-const createMockTranscriptSegment = (overrides?: Partial<TranscriptSegment>): TranscriptSegment => ({
+const createMockTranscriptSegment = (
+  overrides?: Partial<TranscriptSegment>
+): TranscriptSegment => ({
   speaker: 'Interviewer',
   originalText: 'How are you today?',
   englishText: 'How are you today?',
@@ -129,6 +144,7 @@ const createMockTranscriptSegment = (overrides?: Partial<TranscriptSegment>): Tr
 ```
 
 **Location:**
+
 - No fixtures directory exists
 
 ## Coverage
@@ -136,6 +152,7 @@ const createMockTranscriptSegment = (overrides?: Partial<TranscriptSegment>): Tr
 **Requirements:** None enforced. No coverage tooling configured.
 
 **To add coverage (recommended setup):**
+
 ```bash
 # With Vitest (recommended since Vite is already the build tool):
 npx vitest --coverage
@@ -144,6 +161,7 @@ npx vitest --coverage
 ## Test Types
 
 **Unit Tests:**
+
 - None exist
 - High-value targets for unit tests:
   - `parseBuffer()` in `services/geminiService.ts` -- pure function, parses JSONL streaming data
@@ -152,6 +170,7 @@ npx vitest --coverage
   - `generateDocxBlob()` in `components/TranscriptView.tsx` -- document generation logic
 
 **Integration Tests:**
+
 - None exist
 - High-value targets:
   - `uploadFile()` flow in `services/geminiService.ts` -- chunked upload with progress callbacks
@@ -159,33 +178,39 @@ npx vitest --coverage
   - `App.tsx` state machine transitions (IDLE -> UPLOADING -> PROCESSING -> COMPLETED/ERROR)
 
 **E2E Tests:**
+
 - Not configured (no Playwright, Cypress, or similar)
 - Would cover: file upload -> transcription -> download DOCX flow
 
 ## Critical Testability Gaps
 
 **`services/geminiService.ts`:**
+
 - The `getAI()` singleton pattern (lazy-initialized module-level `let ai`) makes the AI client hard to inject for testing
 - `parseBuffer()` and `isDuplicate()` are module-private (not exported); they should be exported or extracted to a utilities file for direct unit testing
 - Files: `services/geminiService.ts` lines 5-15 (singleton), lines 20-44 (parseBuffer), lines 47-66 (isDuplicate)
 
 **`components/TranscriptView.tsx`:**
+
 - `generateDocxBlob()` and `saveBlob()` are defined inside the component, making them untestable in isolation
 - `handleCopy()` uses `alert()` for user feedback -- hard to assert in tests
 - Files: `components/TranscriptView.tsx` lines 19-83 (generateDocxBlob), lines 85-94 (saveBlob), line 123 (alert)
 
 **`components/FileUpload.tsx`:**
+
 - Duration extraction relies on browser `<video>` element with `onloadedmetadata` event -- requires DOM mocking
 - Files: `components/FileUpload.tsx` lines 46-74
 
 ## Recommended Test Setup
 
 **Installation (to establish testing from scratch):**
+
 ```bash
 npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
 ```
 
 **Vitest config (add to `vite.config.ts`):**
+
 ```typescript
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
@@ -201,6 +226,7 @@ export default defineConfig({
 ```
 
 **Add test script to `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -212,4 +238,4 @@ export default defineConfig({
 
 ---
 
-*Testing analysis: 2026-02-06*
+_Testing analysis: 2026-02-06_

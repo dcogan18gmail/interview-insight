@@ -39,14 +39,14 @@ AES-GCM crypto service with PBKDF2 key derivation (100k iterations, SHA-256) and
 
 ## Performance
 
-| Metric | Value |
-|--------|-------|
-| Duration | 1m 19s |
-| Started | 2026-02-07T17:46:19Z |
-| Completed | 2026-02-07T17:47:38Z |
-| Tasks | 2/2 |
-| Files created | 1 |
-| Files modified | 1 |
+| Metric         | Value                |
+| -------------- | -------------------- |
+| Duration       | 1m 19s               |
+| Started        | 2026-02-07T17:46:19Z |
+| Completed      | 2026-02-07T17:47:38Z |
+| Tasks          | 2/2                  |
+| Files created  | 1                    |
+| Files modified | 1                    |
 
 ## Accomplishments
 
@@ -56,10 +56,10 @@ AES-GCM crypto service with PBKDF2 key derivation (100k iterations, SHA-256) and
 
 ## Task Commits
 
-| Task | Name | Commit | Key Files |
-|------|------|--------|-----------|
-| 1 | Create cryptoService.ts with AES-GCM encryption | `f2398a4` | services/cryptoService.ts |
-| 2 | Add security headers to netlify.toml | `5a627b5` | netlify.toml |
+| Task | Name                                            | Commit    | Key Files                 |
+| ---- | ----------------------------------------------- | --------- | ------------------------- |
+| 1    | Create cryptoService.ts with AES-GCM encryption | `f2398a4` | services/cryptoService.ts |
+| 2    | Add security headers to netlify.toml            | `5a627b5` | netlify.toml              |
 
 ## Files Created
 
@@ -71,13 +71,13 @@ AES-GCM crypto service with PBKDF2 key derivation (100k iterations, SHA-256) and
 
 ## Decisions Made
 
-| Decision | Rationale |
-|----------|-----------|
-| PBKDF2 100k iterations, SHA-256 | Balances security with browser performance; OWASP-recommended minimum |
-| Salt(16) + IV(12) + ciphertext in single blob | Simplifies storage to one localStorage key; standard approach for AES-GCM |
-| App-generated passphrase (not user-provided) | Research Option 1: simpler UX, encryption-at-rest protects against raw localStorage exfiltration |
-| `unsafe-inline` in style-src | Required for Tailwind CSS inline styles; no workaround without nonce-based approach |
-| Single CSP line in TOML | Netlify TOML multi-line strings can cause parsing issues; single line is safer |
+| Decision                                      | Rationale                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| PBKDF2 100k iterations, SHA-256               | Balances security with browser performance; OWASP-recommended minimum                            |
+| Salt(16) + IV(12) + ciphertext in single blob | Simplifies storage to one localStorage key; standard approach for AES-GCM                        |
+| App-generated passphrase (not user-provided)  | Research Option 1: simpler UX, encryption-at-rest protects against raw localStorage exfiltration |
+| `unsafe-inline` in style-src                  | Required for Tailwind CSS inline styles; no workaround without nonce-based approach              |
+| Single CSP line in TOML                       | Netlify TOML multi-line strings can cause parsing issues; single line is safer                   |
 
 ## Deviations from Plan
 

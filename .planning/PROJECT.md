@@ -24,6 +24,7 @@ Users can upload an interview recording and get a complete, structured transcrip
 ### Active
 
 **Security & API Model:**
+
 - [ ] BYOK: User provides their own Gemini API key (stored in browser localStorage)
 - [ ] Remove embedded/build-time API key entirely
 - [ ] Fix wildcard CORS on edge function (restrict to app domain)
@@ -32,6 +33,7 @@ Users can upload an interview recording and get a complete, structured transcrip
 - [ ] Add rate limiting to upload endpoints
 
 **Project Management:**
+
 - [ ] Multi-project support: each interview is a project with its own state
 - [ ] Project list/dashboard as landing page
 - [ ] Project grouping/folders (e.g., "Senior Eng Hiring Round")
@@ -40,6 +42,7 @@ Users can upload an interview recording and get a complete, structured transcrip
 - [ ] Ability to cancel in-progress transcription
 
 **UI/UX Polish:**
+
 - [ ] Decompose monolithic App.tsx into proper component hierarchy
 - [ ] Responsive design (works on mobile/tablet)
 - [ ] Proper loading states and error handling throughout
@@ -47,6 +50,7 @@ Users can upload an interview recording and get a complete, structured transcrip
 - [ ] Polished visual design (not homebrew-looking)
 
 **Code Quality:**
+
 - [ ] Pin all dependencies (remove `"latest"` version)
 - [ ] Add ESLint + Prettier configuration
 - [ ] Add test framework (Vitest) with coverage for critical paths
@@ -54,6 +58,7 @@ Users can upload an interview recording and get a complete, structured transcrip
 - [ ] Extract custom hooks from monolithic state management
 
 **Deployment & Infrastructure:**
+
 - [ ] CI/CD: GitHub push triggers Netlify deploy
 - [ ] Custom domain (user to purchase and configure)
 - [ ] Proper environment variable handling across environments
@@ -89,13 +94,14 @@ Users can upload an interview recording and get a complete, structured transcrip
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| BYOK (Bring Your Own Key) model | Solves billing problem, enables public-facing usage without owner paying for all API calls | — Pending |
-| Browser localStorage for persistence | Ships faster than cloud DB, sufficient for v1, accounts/sync deferred to v2 | — Pending |
-| Stay on Netlify | Already deployed, free tier, serverless functions work well for proxy pattern | — Pending |
-| Personal GitHub (not work) | Portfolio project, separate identity from employer | — Pending |
-| Phase v1/v2 split | Harden and ship what exists before adding cloud layer | — Pending |
+| Decision                             | Rationale                                                                                  | Outcome   |
+| ------------------------------------ | ------------------------------------------------------------------------------------------ | --------- |
+| BYOK (Bring Your Own Key) model      | Solves billing problem, enables public-facing usage without owner paying for all API calls | — Pending |
+| Browser localStorage for persistence | Ships faster than cloud DB, sufficient for v1, accounts/sync deferred to v2                | — Pending |
+| Stay on Netlify                      | Already deployed, free tier, serverless functions work well for proxy pattern              | — Pending |
+| Personal GitHub (not work)           | Portfolio project, separate identity from employer                                         | — Pending |
+| Phase v1/v2 split                    | Harden and ship what exists before adding cloud layer                                      | — Pending |
 
 ---
-*Last updated: 2026-02-06 after initialization*
+
+_Last updated: 2026-02-06 after initialization_

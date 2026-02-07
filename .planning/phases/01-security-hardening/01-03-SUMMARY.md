@@ -19,10 +19,10 @@ affects:
 tech-stack:
   added: []
   patterns:
-    - "BYOK Settings modal with validate-before-save flow"
-    - "Async AI client creation (getDecryptedKey per invocation)"
-    - "X-Gemini-Key header for server function BYOK"
-    - "Vite config stripped of env var injection"
+    - 'BYOK Settings modal with validate-before-save flow'
+    - 'Async AI client creation (getDecryptedKey per invocation)'
+    - 'X-Gemini-Key header for server function BYOK'
+    - 'Vite config stripped of env var injection'
 
 key-files:
   created:
@@ -34,17 +34,17 @@ key-files:
 
 key-decisions:
   - id: BYOK-VALIDATE-FIRST
-    decision: "Validate API key against Gemini API before encrypting and storing"
-    rationale: "Prevents users from storing invalid keys, provides immediate feedback"
+    decision: 'Validate API key against Gemini API before encrypting and storing'
+    rationale: 'Prevents users from storing invalid keys, provides immediate feedback'
   - id: BYOK-ASYNC-CLIENT
-    decision: "createAI() is async and creates a fresh GoogleGenAI instance per generateTranscript call"
-    rationale: "Old singleton broke if key changed; one creation per transcription is negligible overhead"
+    decision: 'createAI() is async and creates a fresh GoogleGenAI instance per generateTranscript call'
+    rationale: 'Old singleton broke if key changed; one creation per transcription is negligible overhead'
   - id: BYOK-SEPARATE-DECRYPT
-    decision: "uploadFile and generateTranscript each independently call getDecryptedKey"
-    rationale: "uploadFile needs plaintext key for X-Gemini-Key header; generateTranscript needs it for SDK; both are fast"
+    decision: 'uploadFile and generateTranscript each independently call getDecryptedKey'
+    rationale: 'uploadFile needs plaintext key for X-Gemini-Key header; generateTranscript needs it for SDK; both are fast'
   - id: VITE-SIMPLE-CONFIG
-    decision: "Simplified vite.config.ts to plain defineConfig({}) without loadEnv"
-    rationale: "loadEnv was only used for API key injection; no other env vars needed"
+    decision: 'Simplified vite.config.ts to plain defineConfig({}) without loadEnv'
+    rationale: 'loadEnv was only used for API key injection; no other env vars needed'
 
 duration: 2m 58s
 completed: 2026-02-07
@@ -56,14 +56,14 @@ Settings UI with validate-before-save flow, geminiService rewired to decrypt sto
 
 ## Performance
 
-| Metric | Value |
-|--------|-------|
-| Duration | 2m 58s |
-| Started | 2026-02-07T17:53:11Z |
-| Completed | 2026-02-07T17:56:09Z |
-| Tasks | 2/2 |
-| Files created | 1 |
-| Files modified | 3 |
+| Metric         | Value                |
+| -------------- | -------------------- |
+| Duration       | 2m 58s               |
+| Started        | 2026-02-07T17:53:11Z |
+| Completed      | 2026-02-07T17:56:09Z |
+| Tasks          | 2/2                  |
+| Files created  | 1                    |
+| Files modified | 3                    |
 
 ## Accomplishments
 
@@ -77,10 +77,10 @@ Settings UI with validate-before-save flow, geminiService rewired to decrypt sto
 
 ## Task Commits
 
-| Task | Name | Commit | Key Files |
-|------|------|--------|-----------|
-| 1 | Create Settings component with API key entry, validation, and management | `521f214` | components/Settings.tsx |
-| 2 | Remove embedded API key and rewire geminiService.ts + App.tsx for BYOK | `f41a6c2` | services/geminiService.ts, App.tsx, vite.config.ts |
+| Task | Name                                                                     | Commit    | Key Files                                          |
+| ---- | ------------------------------------------------------------------------ | --------- | -------------------------------------------------- |
+| 1    | Create Settings component with API key entry, validation, and management | `521f214` | components/Settings.tsx                            |
+| 2    | Remove embedded API key and rewire geminiService.ts + App.tsx for BYOK   | `f41a6c2` | services/geminiService.ts, App.tsx, vite.config.ts |
 
 ## Files Created
 
@@ -88,20 +88,20 @@ Settings UI with validate-before-save flow, geminiService rewired to decrypt sto
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                        | Changes                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `services/geminiService.ts` | Replaced getAI() singleton with async createAI() using getDecryptedKey(); uploadFile sends X-Gemini-Key header, uses /api/gemini-upload path; removed process.env.API_KEY |
-| `App.tsx` | Added Settings/hasStoredKey imports, showSettings + apiKeyConfigured state, gear icon in header, API key prompt, Settings modal, transcription guard |
-| `vite.config.ts` | Removed define block with API key injection, removed loadEnv, simplified to plain defineConfig({}) |
+| `App.tsx`                   | Added Settings/hasStoredKey imports, showSettings + apiKeyConfigured state, gear icon in header, API key prompt, Settings modal, transcription guard                      |
+| `vite.config.ts`            | Removed define block with API key injection, removed loadEnv, simplified to plain defineConfig({})                                                                        |
 
 ## Decisions Made
 
-| Decision | Rationale |
-|----------|-----------|
-| Validate key before storing | Prevents storing invalid keys; gives immediate feedback |
-| Async createAI() replaces sync getAI() | Old singleton broke on key change; fresh instance per transcription is negligible overhead |
-| uploadFile and generateTranscript each decrypt independently | Different needs: header for upload, SDK init for transcript; both fast |
-| Removed loadEnv entirely from vite.config.ts | Only used for API key injection; no other env vars needed |
+| Decision                                                     | Rationale                                                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Validate key before storing                                  | Prevents storing invalid keys; gives immediate feedback                                    |
+| Async createAI() replaces sync getAI()                       | Old singleton broke on key change; fresh instance per transcription is negligible overhead |
+| uploadFile and generateTranscript each decrypt independently | Different needs: header for upload, SDK init for transcript; both fast                     |
+| Removed loadEnv entirely from vite.config.ts                 | Only used for API key injection; no other env vars needed                                  |
 
 ## Deviations from Plan
 
@@ -114,6 +114,7 @@ Pre-existing TypeScript error in `netlify/edge-functions/proxy-upload.ts` (missi
 ## Next Phase Readiness
 
 **Phase 1 complete.** All three plans delivered:
+
 - 01-01: Crypto service + security headers
 - 01-02: Server-side hardening (CORS, SSRF, rate limiting, BYOK header)
 - 01-03: Client-side BYOK integration (Settings UI, rewired service, clean build)
@@ -122,6 +123,7 @@ Pre-existing TypeScript error in `netlify/edge-functions/proxy-upload.ts` (missi
 User opens Settings -> enters key -> validated against Gemini API -> encrypted with AES-GCM -> stored in localStorage -> decrypted on use -> passed to SDK (createAI) and server function (X-Gemini-Key header) -> build artifacts contain zero keys.
 
 **For Phase 2+:**
+
 - All Gemini API calls now use BYOK -- no env var dependency for client
 - Settings component available for future preference additions
 - Error handling surfaces "No API key configured" message naturally via existing error UI

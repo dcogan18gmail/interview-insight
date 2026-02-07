@@ -3,7 +3,7 @@ export enum TranscriptionStatus {
   UPLOADING = 'UPLOADING', // Processing file locally
   PROCESSING = 'PROCESSING', // Sending to Gemini
   COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
 }
 
 export interface TranscriptSegment {

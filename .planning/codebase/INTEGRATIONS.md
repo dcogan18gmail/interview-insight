@@ -5,6 +5,7 @@
 ## APIs & External Services
 
 **Google Gemini AI (Primary Integration):**
+
 - Purpose: AI-powered audio/video transcription and translation
 - Model: `gemini-3-pro-preview`
 - SDK/Client: `@google/genai` (latest) - client-side in `services/geminiService.ts`
@@ -37,6 +38,7 @@
    - Auth: API key embedded in client bundle at build time (`process.env.API_KEY`)
 
 **Google Fonts CDN:**
+
 - Purpose: Load Inter font family
 - URL: `https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap`
 - Referenced in: `index.html`
@@ -45,22 +47,27 @@
 ## Data Storage
 
 **Databases:**
+
 - None. The application is stateless; no database is used.
 
 **File Storage:**
+
 - Google Gemini File API (temporary) - Files are uploaded for AI processing and referenced by URI
 - Client-side only: `File` objects held in React state during a session
 - No persistent file storage
 
 **Caching:**
+
 - None. No client-side or server-side caching layer.
 
 ## Authentication & Identity
 
 **Auth Provider:**
+
 - None. The application has no user authentication or identity system.
 
 **API Authentication:**
+
 - Gemini API Key (`GEMINI_API_KEY`) - used in two places:
   1. Server-side in `netlify/functions/gemini-upload.ts` via `process.env.GEMINI_API_KEY`
   2. Client-side in `services/geminiService.ts` via `process.env.API_KEY` (injected at build time by Vite in `vite.config.ts`)
@@ -69,9 +76,11 @@
 ## Monitoring & Observability
 
 **Error Tracking:**
+
 - None. No Sentry, Datadog, or equivalent.
 
 **Logs:**
+
 - `console.log` / `console.error` / `console.warn` throughout `services/geminiService.ts` for transcription progress and errors
 - `console.error` in `netlify/functions/gemini-upload.ts` for upload failures
 - No structured logging framework
@@ -79,11 +88,13 @@
 ## CI/CD & Deployment
 
 **Hosting:**
+
 - Netlify (static site + serverless functions + edge functions)
 - Build output: `dist/` directory
 - SPA routing via `netlify.toml` redirect rule
 
 **CI Pipeline:**
+
 - None configured in the repository
 - Deployment is manual via:
   1. Netlify CLI (`netlify deploy --prod`)
@@ -91,24 +102,30 @@
   3. Git-connected auto-deploy (documented but not configured)
 
 **Deployment Configuration:**
+
 - `netlify.toml` - Build command, publish directory, functions directory, edge functions, redirects
 
 ## Environment Configuration
 
 **Required env vars:**
+
 - `GEMINI_API_KEY` - Google Gemini API key (required for both file upload and content generation)
 
 **Template:**
+
 - `.env.example` - Contains `GEMINI_API_KEY=your_api_key_here`
 
 **Local development:**
+
 - `.env.local` - Local override (gitignored)
 - Vite reads env vars from `.env.local` and injects them at build time
 
 **Production:**
+
 - Set `GEMINI_API_KEY` in Netlify dashboard (Site settings > Environment variables)
 
 **Secrets location:**
+
 - No dedicated secrets manager
 - Env vars managed via Netlify dashboard for production
 - `.env.local` for local development
@@ -116,20 +133,24 @@
 ## Webhooks & Callbacks
 
 **Incoming:**
+
 - None
 
 **Outgoing:**
+
 - None
 
 ## Serverless Functions
 
 **Netlify Functions (`netlify/functions/`):**
+
 - `gemini-upload.ts` - POST handler that initiates a resumable upload to Google Gemini File API
   - Accepts: `{ name, size, mimeType }` JSON body
   - Returns: `{ uploadUrl }` for client-side chunked upload
   - Auth: Server-side `GEMINI_API_KEY`
 
 **Netlify Edge Functions (`netlify/edge-functions/`):**
+
 - `proxy-upload.ts` - PUT proxy that streams file chunks to Google's resumable upload URL
   - Accepts: Binary body with upload metadata headers (`X-Upload-Url`, `Content-Range`, `X-Goog-Upload-Command`, `X-Goog-Upload-Offset`)
   - Streams request body directly to Google (bypasses Netlify's 6MB function size limit)
@@ -139,6 +160,7 @@
 ## Client-Side Document Generation
 
 **DOCX Export (`components/TranscriptView.tsx`):**
+
 - Library: `docx` ^9.0.0
 - Generates Word documents entirely client-side
 - Export formats: English only, Original only, Combined, or All three
@@ -146,4 +168,4 @@
 
 ---
 
-*Integration audit: 2026-02-06*
+_Integration audit: 2026-02-06_

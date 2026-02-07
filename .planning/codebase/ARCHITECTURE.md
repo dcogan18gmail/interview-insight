@@ -7,6 +7,7 @@
 **Overall:** Single-Page Application (SPA) with serverless backend functions
 
 **Key Characteristics:**
+
 - React SPA with all UI state managed in the root `App` component via `useState` hooks
 - No client-side routing -- the entire app is a single-view wizard-style flow (upload -> process -> view)
 - Backend logic split between Netlify Functions (Node.js) for API-key-protected initiation and Netlify Edge Functions (Deno) for streaming file upload proxy
@@ -15,6 +16,7 @@
 ## Layers
 
 **Presentation Layer (React Components):**
+
 - Purpose: Render UI and capture user interaction
 - Location: `components/`
 - Contains: `FileUpload.tsx`, `TranscriptView.tsx`, `LoadingState.tsx`
@@ -22,6 +24,7 @@
 - Used by: `App.tsx`
 
 **Application/Orchestration Layer (App Root):**
+
 - Purpose: Manage application state machine (IDLE -> UPLOADING -> PROCESSING -> COMPLETED/ERROR) and coordinate between service layer and presentation
 - Location: `App.tsx`
 - Contains: All top-level state (`useState` hooks), event handlers (`handleFileSelected`, `handleStartTranscription`, `handleReset`), conditional rendering logic
@@ -29,6 +32,7 @@
 - Used by: `index.tsx` (entry point)
 
 **Service Layer (Gemini Integration):**
+
 - Purpose: Encapsulate all Gemini AI API communication -- file upload orchestration and streaming transcript generation
 - Location: `services/geminiService.ts`
 - Contains: `uploadFile()` function (chunked upload via Netlify proxy), `generateTranscript()` function (streaming JSONL transcription with retry/dedup logic)
@@ -36,6 +40,7 @@
 - Used by: `App.tsx`
 
 **Serverless Backend Layer (Netlify Functions):**
+
 - Purpose: Protect API keys and proxy large file uploads to Google's Gemini File API, bypassing browser CORS and Netlify's 6MB function body limit
 - Location: `netlify/functions/` and `netlify/edge-functions/`
 - Contains:
@@ -45,6 +50,7 @@
 - Used by: `services/geminiService.ts` (via HTTP fetch)
 
 **Types Layer:**
+
 - Purpose: Shared TypeScript type definitions
 - Location: `types.ts`
 - Contains: `TranscriptionStatus` enum, `TranscriptSegment` interface, `FileData` interface
@@ -83,6 +89,7 @@
 4. Alternatively, user can "Copy" the transcript as formatted plain text to clipboard
 
 **State Management:**
+
 - All state lives in `App.tsx` via six `useState` hooks: `status`, `fileData`, `transcript`, `errorMessage`, `progress`, `currentSegment`
 - No external state management library (no Redux, Zustand, etc.)
 - State machine is implicit via the `TranscriptionStatus` enum (IDLE -> UPLOADING -> PROCESSING -> COMPLETED | ERROR)
@@ -91,26 +98,31 @@
 ## Key Abstractions
 
 **TranscriptionStatus (State Machine):**
+
 - Purpose: Governs which UI phase is displayed and what actions are available
 - Examples: `types.ts` line 1-7
 - Pattern: TypeScript enum with 5 states: IDLE, UPLOADING, PROCESSING, COMPLETED, ERROR
 
 **TranscriptSegment (Data Model):**
+
 - Purpose: Represents a single unit of transcribed speech
 - Examples: `types.ts` line 9-14
 - Pattern: Interface with speaker identification, dual-language text (original + English translation), and numeric timestamp
 
 **FileData (Upload Metadata):**
+
 - Purpose: Encapsulates all metadata about an uploaded file needed for processing
 - Examples: `types.ts` line 16-23
 - Pattern: Interface bridging browser File API with Gemini File API (holds raw `File`, optional `base64`, optional `fileUri`)
 
 **Resumable Upload Protocol:**
+
 - Purpose: Upload large media files (up to 2GB) to Google Gemini File API via chunked resumable upload
 - Examples: `services/geminiService.ts` lines 68-135, `netlify/functions/gemini-upload.ts`, `netlify/edge-functions/proxy-upload.ts`
 - Pattern: Two-phase upload: (1) Netlify Function initiates session and gets upload URL, (2) Edge Function proxies 8MB chunks to that URL
 
 **Streaming JSONL Transcript Parser:**
+
 - Purpose: Parse Gemini's streaming response into structured transcript segments in real-time
 - Examples: `services/geminiService.ts` lines 20-44 (`parseBuffer`)
 - Pattern: Accumulates text in a buffer, splits on newlines, parses each complete line as JSON, returns remaining partial line for next iteration
@@ -118,16 +130,19 @@
 ## Entry Points
 
 **Browser Entry:**
+
 - Location: `index.html` -> `index.tsx`
 - Triggers: Page load in browser
 - Responsibilities: Mounts React app to `#root` DOM element, wraps in StrictMode
 
 **Netlify Function -- Upload Initiation:**
+
 - Location: `netlify/functions/gemini-upload.ts`
 - Triggers: POST to `/.netlify/functions/gemini-upload`
 - Responsibilities: Validates file metadata, initiates resumable upload session with Google Gemini File API using server-side API key, returns upload URL
 
 **Netlify Edge Function -- Upload Proxy:**
+
 - Location: `netlify/edge-functions/proxy-upload.ts`
 - Triggers: PUT to `/proxy-upload` (mapped in `netlify.toml`)
 - Responsibilities: Proxies chunked file upload data from the browser to Google's resumable upload URL, handles CORS
@@ -137,6 +152,7 @@
 **Strategy:** Try-catch at each layer boundary with error propagation up to `App.tsx` for user-facing display
 
 **Patterns:**
+
 - `App.tsx` wraps the entire transcription flow in a try-catch, setting `TranscriptionStatus.ERROR` and extracting the error message for display
 - `services/geminiService.ts` has nested try-catch: outer for fatal errors, inner per-chunk for retryable errors (up to `MAX_RETRIES = 3`)
 - `geminiService.ts` uses a retry mechanism with a 5-second "nudge" forward on mid-file stalls, and breaks after `MAX_LOOPS = 40` to prevent infinite loops
@@ -148,9 +164,10 @@
 
 **Logging:** `console.log` / `console.warn` / `console.error` throughout `services/geminiService.ts` for loop progress tracking and error diagnostics. No structured logging framework.
 
-**Validation:** Client-side only. `FileUpload.tsx` validates MIME type (audio/* or video/*) and file size (max 2GB). `gemini-upload.ts` validates presence of name/size/mimeType in the request body.
+**Validation:** Client-side only. `FileUpload.tsx` validates MIME type (audio/_ or video/_) and file size (max 2GB). `gemini-upload.ts` validates presence of name/size/mimeType in the request body.
 
 **Authentication:** No user authentication. The Gemini API key is the sole credential:
+
 - Client-side: Injected at build time via `vite.config.ts` `define` (exposes key in browser bundle)
 - Server-side: Read from `process.env.GEMINI_API_KEY` in Netlify Functions
 
@@ -160,4 +177,4 @@
 
 ---
 
-*Architecture analysis: 2026-02-06*
+_Architecture analysis: 2026-02-06_

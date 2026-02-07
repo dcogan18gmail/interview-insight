@@ -92,18 +92,21 @@ Layer-based (`components/`, `hooks/`, `services/` all flat) doesn't scale — yo
 ### Context Providers (App-Level State)
 
 **SettingsContext** — Owns:
+
 - API key (encrypted in localStorage)
 - Key validation status
 - User preferences (theme, defaults)
 - Read/write to localStorage settings key
 
 **ProjectsContext** — Owns:
+
 - Project list (metadata only — not full transcripts)
 - CRUD operations (create, rename, delete, update status)
 - Read/write to localStorage projects key
 - Does NOT own transcript data (too large for context)
 
 **ToastContext** — Owns:
+
 - Toast queue
 - Auto-dismiss timers
 - No persistence
@@ -111,16 +114,19 @@ Layer-based (`components/`, `hooks/`, `services/` all flat) doesn't scale — yo
 ### Feature Modules
 
 Each feature module owns:
+
 - Its own components (visual)
 - Its own hooks (behavior/state)
 - Its own types (if feature-specific)
 
 Features communicate through:
+
 - Context (for shared state like API key, project list)
 - Props (for parent-child)
 - Route params (for navigation)
 
 Features do NOT:
+
 - Import from other features directly
 - Share internal components
 - Access localStorage directly (go through services)
@@ -172,22 +178,28 @@ const STORAGE_KEY = 'interview-insight';
 interface StorageSchema {
   version: 2;
   settings: {
-    apiKey: string | null;      // Encrypted with Web Crypto
-    apiKeyHash: string | null;  // For display/comparison without decrypting
+    apiKey: string | null; // Encrypted with Web Crypto
+    apiKeyHash: string | null; // For display/comparison without decrypting
     preferences: {
       defaultExportFormat: 'english' | 'original' | 'combined';
       autoScroll: boolean;
     };
   };
-  projects: ProjectMeta[];      // Metadata only (small)
+  projects: ProjectMeta[]; // Metadata only (small)
 }
 
 interface ProjectMeta {
-  id: string;                   // UUID
+  id: string; // UUID
   name: string;
-  createdAt: string;            // ISO date
+  createdAt: string; // ISO date
   updatedAt: string;
-  status: 'uploading' | 'transcribing' | 'completed' | 'error' | 'cancelled' | 'interrupted';
+  status:
+    | 'uploading'
+    | 'transcribing'
+    | 'completed'
+    | 'error'
+    | 'cancelled'
+    | 'interrupted';
   fileInfo: {
     name: string;
     size: number;
@@ -196,7 +208,7 @@ interface ProjectMeta {
   };
   segmentCount: number;
   error?: string;
-  groupId?: string;             // For future folder/grouping
+  groupId?: string; // For future folder/grouping
 }
 
 // Transcript data stored in separate keys (one per project)
@@ -204,18 +216,20 @@ interface ProjectMeta {
 interface TranscriptData {
   projectId: string;
   segments: TranscriptSegment[];
-  lastTimestamp: string;         // For resume capability
+  lastTimestamp: string; // For resume capability
 }
 ```
 
 ### Why Separate Keys for Transcripts
 
 localStorage has a ~5-10MB total limit. Storing all transcripts in one key:
+
 - Risks hitting quota on a single write
 - Requires loading ALL transcript data to read ONE project
 - Makes corruption affect ALL projects
 
 Separate keys (`interview-insight:transcript:{id}`):
+
 - Each project's transcript is independent
 - Loading project list is fast (metadata only)
 - Corruption is isolated
@@ -290,7 +304,12 @@ async function deriveKey(passphrase: string): Promise<CryptoKey> {
     ['deriveKey']
   );
   return crypto.subtle.deriveKey(
-    { name: KEY_DERIVATION, salt: APP_SALT, iterations: 100000, hash: 'SHA-256' },
+    {
+      name: KEY_DERIVATION,
+      salt: APP_SALT,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
     keyMaterial,
     { name: ALGORITHM, length: 256 },
     false,
@@ -315,7 +334,7 @@ export async function encryptApiKey(apiKey: string): Promise<string> {
 
 export async function decryptApiKey(stored: string): Promise<string> {
   const key = await deriveKey(window.location.origin);
-  const combined = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+  const combined = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
   const iv = combined.slice(0, 12);
   const ciphertext = combined.slice(12);
   const decrypted = await crypto.subtle.decrypt(
@@ -353,7 +372,12 @@ const handler: Handler = async (event) => {
 type TranscriptionState =
   | { phase: 'idle' }
   | { phase: 'uploading'; progress: number }
-  | { phase: 'processing'; progress: number; segmentCount: number; elapsedMs: number }
+  | {
+      phase: 'processing';
+      progress: number;
+      segmentCount: number;
+      elapsedMs: number;
+    }
   | { phase: 'completed'; totalSegments: number; totalMs: number }
   | { phase: 'error'; message: string; partialSegments: number }
   | { phase: 'cancelled'; partialSegments: number }
@@ -379,6 +403,7 @@ type TranscriptionState =
 ## 7. Suggested Build Order
 
 ### Phase 0: Foundation (Before Any Features)
+
 - Create src/ directory structure
 - Install react-router-dom
 - Create base route definitions
@@ -391,6 +416,7 @@ type TranscriptionState =
 **Dependencies:** None (this is the foundation)
 
 ### Phase 1: BYOK + Settings
+
 - Create SettingsPage and ApiKeyForm
 - Implement Web Crypto encryption
 - Update geminiService to accept apiKey as parameter
@@ -401,6 +427,7 @@ type TranscriptionState =
 **Dependencies:** Phase 0
 
 ### Phase 2: Core Transcription Refactor
+
 - Create useTranscription hook (state machine)
 - Thread AbortSignal through upload/transcribe
 - Create LiveTranscriptFeed
@@ -410,6 +437,7 @@ type TranscriptionState =
 **Dependencies:** Phase 1
 
 ### Phase 3: Multi-Project Dashboard
+
 - ProjectDashboard, ProjectCard components
 - NewProjectFlow (upload wizard)
 - ProjectDetail page
@@ -419,6 +447,7 @@ type TranscriptionState =
 **Dependencies:** Phase 2
 
 ### Phase 4: Transcript View Polish
+
 - Extract TranscriptView into feature module
 - Extract DOCX generation into service
 - Fix download timing issues
@@ -427,6 +456,7 @@ type TranscriptionState =
 **Dependencies:** Phase 3
 
 ### Phase 5: UI Polish + Error Handling
+
 - Shared UI components
 - ErrorBoundary, Toast integration
 - Error message sanitization
@@ -437,6 +467,7 @@ type TranscriptionState =
 **Dependencies:** Phase 4
 
 ### Phase 6: Quality + DevEx
+
 - ESLint + Prettier
 - Vitest + React Testing Library
 - Tests for critical paths
@@ -475,30 +506,39 @@ Phase 6 (Quality + DevEx)
 ## 8. Migration Strategy: Incremental Strangler Fig
 
 ### Step 1: Move Files to src/
+
 Move existing files into src/ directory. Update index.html, vite.config.ts, tsconfig.json, tailwind.config.js. Verify app works identically.
 
 ### Step 2: Add Router (Invisible)
+
 Wrap existing App content in a catch-all route. Rename current App.tsx to LegacyApp.tsx. New App.tsx = Providers + Router. App works exactly as before.
 
 ### Step 3: Add Contexts (Empty Shells)
+
 Create contexts with default values. Wrap router in providers. Nothing consumes them yet. App still works.
 
 ### Step 4: Add Settings Page (New Route)
+
 Add /settings route alongside legacy catch-all. Build ApiKeyForm. Old app untouched.
 
 ### Step 5: Wire BYOK Into Legacy
+
 Modify geminiService to accept apiKey parameter. LegacyApp reads from SettingsContext. Remove env vars from vite.config.ts.
 
 ### Step 6: Add Dashboard Route
+
 Add /, /project/new, /project/:id routes. Keep /legacy for fallback.
 
 ### Step 7: Extract Components
+
 Move components from legacy into feature modules one at a time. Each extraction: create new, update imports, delete old, verify.
 
 ### Step 8: Delete Legacy
+
 Remove LegacyApp.tsx and /legacy route. Migration complete.
 
 ### Safety: At Every Step
+
 - npm run dev starts without errors
 - npm run build succeeds
 - File upload works
@@ -510,14 +550,14 @@ Remove LegacyApp.tsx and /legacy route. Migration complete.
 
 ## Appendix: Key Technical Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Router | react-router-dom v6 | De facto standard, lightweight |
-| State management | React Context + useReducer | Sufficient for this scale |
-| API key encryption | Web Crypto AES-GCM | Built-in, no dependency |
-| Persistence | localStorage (separate keys per project) | Simple, sufficient capacity |
-| Directory structure | Feature-based | Scales with features, clear ownership |
-| CSS | Keep Tailwind + shared UI components | Already using Tailwind |
+| Decision            | Choice                                   | Rationale                             |
+| ------------------- | ---------------------------------------- | ------------------------------------- |
+| Router              | react-router-dom v6                      | De facto standard, lightweight        |
+| State management    | React Context + useReducer               | Sufficient for this scale             |
+| API key encryption  | Web Crypto AES-GCM                       | Built-in, no dependency               |
+| Persistence         | localStorage (separate keys per project) | Simple, sufficient capacity           |
+| Directory structure | Feature-based                            | Scales with features, clear ownership |
+| CSS                 | Keep Tailwind + shared UI components     | Already using Tailwind                |
 
 ## Appendix: New Dependencies
 
@@ -526,10 +566,11 @@ Only ONE new runtime dependency: `react-router-dom ^6.x`
 Everything else (Web Crypto, localStorage, AbortController) is built into the browser.
 
 Optional later additions:
+
 - `@tanstack/react-virtual` — virtual scrolling for long transcripts
 - `clsx` or `tailwind-merge` — Tailwind class merging
 
 ---
 
-*Research Date: 2026-02-06*
-*Researcher: Claude Opus 4.6*
+_Research Date: 2026-02-06_
+_Researcher: Claude Opus 4.6_

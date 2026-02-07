@@ -2,7 +2,17 @@
 phase: 01-security-hardening
 plan: 02
 subsystem: server-functions
-tags: [cors, ssrf, rate-limiting, error-sanitization, byok, netlify, edge-functions, serverless]
+tags:
+  [
+    cors,
+    ssrf,
+    rate-limiting,
+    error-sanitization,
+    byok,
+    netlify,
+    edge-functions,
+    serverless,
+  ]
 
 requires: []
 provides:
@@ -15,12 +25,12 @@ affects:
 tech-stack:
   added: []
   patterns:
-    - "Origin allowlist CORS (no wildcard)"
-    - "SSRF prevention via URL hostname/protocol/path validation"
-    - "BYOK via X-Gemini-Key request header with env var fallback"
-    - "Netlify rate limiting via config export"
-    - "Error sanitization with server-side logging"
-    - "Netlify Functions v2 format (Request/Response)"
+    - 'Origin allowlist CORS (no wildcard)'
+    - 'SSRF prevention via URL hostname/protocol/path validation'
+    - 'BYOK via X-Gemini-Key request header with env var fallback'
+    - 'Netlify rate limiting via config export'
+    - 'Error sanitization with server-side logging'
+    - 'Netlify Functions v2 format (Request/Response)'
 
 key-files:
   created: []
@@ -30,20 +40,20 @@ key-files:
 
 key-decisions:
   - id: SEC-CORS
-    decision: "CORS restricted to explicit origin allowlist instead of wildcard"
-    rationale: "Prevents unauthorized cross-origin access; Vary header ensures CDN correctness"
+    decision: 'CORS restricted to explicit origin allowlist instead of wildcard'
+    rationale: 'Prevents unauthorized cross-origin access; Vary header ensures CDN correctness'
   - id: SEC-SSRF
-    decision: "Upload URL validated against generativelanguage.googleapis.com hostname, https protocol, and /upload/ path prefix"
-    rationale: "Prevents SSRF by ensuring proxy only forwards to intended Google API endpoint"
+    decision: 'Upload URL validated against generativelanguage.googleapis.com hostname, https protocol, and /upload/ path prefix'
+    rationale: 'Prevents SSRF by ensuring proxy only forwards to intended Google API endpoint'
   - id: SEC-BYOK
-    decision: "API key read from X-Gemini-Key header first, falling back to process.env.GEMINI_API_KEY"
-    rationale: "Enables BYOK model where each user provides their own key; fallback preserves backward compatibility during transition"
+    decision: 'API key read from X-Gemini-Key header first, falling back to process.env.GEMINI_API_KEY'
+    rationale: 'Enables BYOK model where each user provides their own key; fallback preserves backward compatibility during transition'
   - id: SEC-RATE
-    decision: "Rate limits set at 100/60s for proxy-upload (high volume PUT uploads) and 20/60s for gemini-upload (session initiation)"
-    rationale: "Different limits reflect different usage patterns; initiation is rarer than chunk uploads"
+    decision: 'Rate limits set at 100/60s for proxy-upload (high volume PUT uploads) and 20/60s for gemini-upload (session initiation)'
+    rationale: 'Different limits reflect different usage patterns; initiation is rarer than chunk uploads'
   - id: SEC-V2
-    decision: "Migrated gemini-upload to Netlify Functions v2 format"
-    rationale: "Required for rate limiting config support; modernizes to Web-standard Request/Response API"
+    decision: 'Migrated gemini-upload to Netlify Functions v2 format'
+    rationale: 'Required for rate limiting config support; modernizes to Web-standard Request/Response API'
 
 duration: ~1 minute
 completed: 2026-02-07
@@ -55,13 +65,13 @@ Hardened both server functions with CORS origin allowlist, SSRF URL validation, 
 
 ## Performance
 
-| Metric | Value |
-|--------|-------|
-| Duration | ~1 minute |
-| Started | 2026-02-07T17:47:22Z |
-| Completed | 2026-02-07T17:48:34Z |
-| Tasks | 2/2 |
-| Files modified | 2 |
+| Metric         | Value                |
+| -------------- | -------------------- |
+| Duration       | ~1 minute            |
+| Started        | 2026-02-07T17:47:22Z |
+| Completed      | 2026-02-07T17:48:34Z |
+| Tasks          | 2/2                  |
+| Files modified | 2                    |
 
 ## Accomplishments
 
@@ -79,17 +89,17 @@ Hardened both server functions with CORS origin allowlist, SSRF URL validation, 
 
 ## Task Commits
 
-| Task | Name | Commit | Key Changes |
-|------|------|--------|-------------|
-| 1 | Harden proxy-upload.ts | `025b621` | CORS allowlist, SSRF prevention, rate limiting, error sanitization |
-| 2 | Migrate gemini-upload.ts to v2 with BYOK | `a20b58e` | v2 format, X-Gemini-Key header, rate limiting, error sanitization |
+| Task | Name                                     | Commit    | Key Changes                                                        |
+| ---- | ---------------------------------------- | --------- | ------------------------------------------------------------------ |
+| 1    | Harden proxy-upload.ts                   | `025b621` | CORS allowlist, SSRF prevention, rate limiting, error sanitization |
+| 2    | Migrate gemini-upload.ts to v2 with BYOK | `a20b58e` | v2 format, X-Gemini-Key header, rate limiting, error sanitization  |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `netlify/edge-functions/proxy-upload.ts` | Added ALLOWED_ORIGINS, getCorsHeaders(), isAllowedUploadUrl(), rate limit config, sanitized errors |
-| `netlify/functions/gemini-upload.ts` | Migrated to v2 format, added X-Gemini-Key header read, rate limit config, sanitized errors, removed unused import |
+| File                                     | Changes                                                                                                           |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `netlify/edge-functions/proxy-upload.ts` | Added ALLOWED_ORIGINS, getCorsHeaders(), isAllowedUploadUrl(), rate limit config, sanitized errors                |
+| `netlify/functions/gemini-upload.ts`     | Migrated to v2 format, added X-Gemini-Key header read, rate limit config, sanitized errors, removed unused import |
 
 ## Decisions Made
 
@@ -114,11 +124,13 @@ None.
 ## Next Phase Readiness
 
 **For Plan 03 (Client-Side Security):**
+
 - Client must be updated to send `X-Gemini-Key` header in upload initiation requests
 - Client must update upload endpoint URL from `/.netlify/functions/gemini-upload` to `/api/gemini-upload`
 - Client should handle 401 responses (missing API key) with appropriate UI guidance
 
 **For deployment:**
+
 - Rate limiting config uses Netlify's built-in rate limiting -- no additional infrastructure needed
 - CORS allowlist may need updating if production URL changes
 

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   encryptApiKey,
   validateGeminiApiKey,
   getOrCreatePassphrase,
   hasStoredKey,
   clearStoredKey,
-} from "../services/cryptoService";
+} from '../services/cryptoService';
 
 interface SettingsProps {
   onClose: () => void;
@@ -13,7 +13,7 @@ interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
   const handleSaveKey = async () => {
     const trimmedKey = apiKey.trim();
     if (!trimmedKey) {
-      setError("Please enter an API key");
+      setError('Please enter an API key');
       return;
     }
 
@@ -37,7 +37,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
     const result = await validateGeminiApiKey(trimmedKey);
 
     if (!result.valid) {
-      setError(result.error || "Invalid API key");
+      setError(result.error || 'Invalid API key');
       setIsValidating(false);
       return;
     }
@@ -45,16 +45,16 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
     try {
       const passphrase = getOrCreatePassphrase();
       const encrypted = await encryptApiKey(trimmedKey, passphrase);
-      localStorage.setItem("gemini_encrypted_key", encrypted);
+      localStorage.setItem('gemini_encrypted_key', encrypted);
     } catch {
-      setError("Failed to encrypt and save key. Please try again.");
+      setError('Failed to encrypt and save key. Please try again.');
       setIsValidating(false);
       return;
     }
 
-    setApiKey("");
+    setApiKey('');
     setKeyExists(true);
-    setSuccess("API key saved successfully!");
+    setSuccess('API key saved successfully!');
     setIsValidating(false);
     onKeyChanged();
   };
@@ -67,17 +67,17 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900">Settings</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
+            className="text-slate-400 transition-colors hover:text-slate-600"
           >
             <svg
-              className="w-5 h-5"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -94,10 +94,10 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
 
         {/* API Key Section */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-2">
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-700">
             Gemini API Key
           </h3>
-          <p className="text-sm text-slate-500 mb-3">
+          <p className="mb-3 text-sm text-slate-500">
             Enter your own Gemini API key to use this app. Your key is encrypted
             and stored locally in your browser.
           </p>
@@ -105,20 +105,20 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
             href="https://aistudio.google.com/app/apikey"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-sm text-indigo-600 hover:text-indigo-700 font-medium mb-4"
+            className="mb-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-700"
           >
             Get a key from Google AI Studio &rarr;
           </a>
 
           {/* Key Status */}
           {keyExists && (
-            <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 mb-4">
+            <div className="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-4 py-2.5">
               <span className="text-sm font-medium text-green-700">
                 Key configured
               </span>
               <button
                 onClick={handleClearKey}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                className="text-sm font-medium text-red-600 hover:text-red-700"
               >
                 Clear Key
               </button>
@@ -131,27 +131,27 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onKeyChanged }) => {
             placeholder="Enter your Gemini API key..."
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm mb-3 outline-none"
+            className="mb-3 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
           />
 
           {/* Error */}
-          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+          {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
 
           {/* Success */}
-          {success && <p className="text-sm text-green-600 mb-3">{success}</p>}
+          {success && <p className="mb-3 text-sm text-green-600">{success}</p>}
 
           {/* Save Button */}
           <button
             onClick={handleSaveKey}
             disabled={isValidating}
-            className="w-full px-4 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isValidating ? "Validating..." : "Validate & Save Key"}
+            {isValidating ? 'Validating...' : 'Validate & Save Key'}
           </button>
         </div>
 
         {/* Footer Security Note */}
-        <p className="text-xs text-slate-400 mt-6 text-center">
+        <p className="mt-6 text-center text-xs text-slate-400">
           Your key is encrypted with AES-256-GCM and stored only in your
           browser. It is never sent to our servers.
         </p>

@@ -49,32 +49,38 @@ interview-insight-fixed/
 ## Directory Purposes
 
 **`components/`:**
+
 - Purpose: Presentational React components
 - Contains: 3 TSX files, each a single default-exported React.FC component
 - Key files: `FileUpload.tsx` (file input + validation), `TranscriptView.tsx` (results + export), `LoadingState.tsx` (progress display)
 
 **`services/`:**
+
 - Purpose: Business logic and external API communication
 - Contains: 1 TypeScript module with 2 exported functions
 - Key files: `geminiService.ts` -- the core service handling both file upload orchestration and AI transcription
 
 **`netlify/functions/`:**
+
 - Purpose: Netlify serverless functions (Node.js runtime, deployed automatically)
 - Contains: 1 TypeScript handler function
 - Key files: `gemini-upload.ts` -- initiates resumable upload with Google's Gemini File API
 
 **`netlify/edge-functions/`:**
+
 - Purpose: Netlify Edge Functions (Deno runtime, runs at CDN edge)
 - Contains: 1 TypeScript edge function
 - Key files: `proxy-upload.ts` -- proxies chunked file uploads to Google (bypasses 6MB function limit)
 
 **`dist/`:**
+
 - Purpose: Production build output
 - Contains: Vite-built HTML, JS bundles, CSS
 - Generated: Yes (by `npm run build`)
 - Committed: Yes (currently committed, though typically should not be)
 
 **`.netlify/`:**
+
 - Purpose: Local Netlify CLI development artifacts
 - Contains: Auto-generated function builds, edge function vendors
 - Generated: Yes
@@ -83,11 +89,13 @@ interview-insight-fixed/
 ## Key File Locations
 
 **Entry Points:**
+
 - `index.html`: HTML shell with `<div id="root">` and Vite module script tag pointing to `index.tsx`
 - `index.tsx`: React entry -- creates root and renders `<App />` in StrictMode
 - `App.tsx`: Application root component with all state management and flow orchestration
 
 **Configuration:**
+
 - `vite.config.ts`: Build tool config -- port 3000, React plugin, path alias `@/`, env var injection
 - `tsconfig.json`: TypeScript -- ES2022 target, bundler module resolution, `@/*` path alias
 - `netlify.toml`: Netlify deployment -- build command, publish dir, function directory, edge function routing, SPA redirect
@@ -96,18 +104,22 @@ interview-insight-fixed/
 - `.env.example`: Documents required `GEMINI_API_KEY` variable
 
 **Core Logic:**
+
 - `services/geminiService.ts`: All Gemini AI interaction -- `uploadFile()` (lines 68-135) and `generateTranscript()` (lines 137-327)
 - `App.tsx`: State machine orchestration -- `handleStartTranscription()` (lines 24-71) drives the entire upload-to-transcript pipeline
 
 **Types:**
+
 - `types.ts`: All shared types -- `TranscriptionStatus` enum, `TranscriptSegment` interface, `FileData` interface
 
 **Styling:**
+
 - `index.css`: Tailwind directives, custom scrollbar hiding, `animate-fade-in` keyframe animation
 
 ## Naming Conventions
 
 **Files:**
+
 - React components: PascalCase with `.tsx` extension (e.g., `FileUpload.tsx`, `TranscriptView.tsx`)
 - Services: camelCase with `.ts` extension (e.g., `geminiService.ts`)
 - Netlify functions: kebab-case with `.ts` extension (e.g., `gemini-upload.ts`, `proxy-upload.ts`)
@@ -115,10 +127,12 @@ interview-insight-fixed/
 - Root-level app files: PascalCase for components (`App.tsx`), lowercase for entry points (`index.tsx`, `index.html`, `index.css`)
 
 **Directories:**
+
 - All lowercase: `components/`, `services/`, `netlify/`, `dist/`
 - Netlify convention: `functions/`, `edge-functions/`
 
 **Exports:**
+
 - Components: Single default export per file (`export default ComponentName`)
 - Services: Named exports (`export const uploadFile`, `export const generateTranscript`)
 - Netlify functions: Named export of `handler` (`export { handler }`)
@@ -128,57 +142,68 @@ interview-insight-fixed/
 ## Where to Add New Code
 
 **New React Component:**
+
 - Implementation: `components/NewComponent.tsx`
 - Import in: `App.tsx` (or parent component)
 - Pattern: `React.FC` with typed props interface, default export, Tailwind CSS for styling
 
 **New Service/API Integration:**
+
 - Implementation: `services/newService.ts`
 - Pattern: Named function exports, lazy-initialized clients, error handling with try-catch
 
 **New Netlify Function (server-side logic):**
+
 - Implementation: `netlify/functions/function-name.ts`
 - Pattern: Export a `Handler` from `@netlify/functions`, handle HTTP method validation, parse body, return `{ statusCode, body }` objects
 - Auto-detected by Netlify CLI at `/.netlify/functions/function-name`
 
 **New Netlify Edge Function (streaming/proxy):**
+
 - Implementation: `netlify/edge-functions/function-name.ts`
 - Routing: Add `[[edge_functions]]` entry in `netlify.toml`
 - Pattern: Default export async function taking `(request: Request, context: Context)`
 
 **New Shared Types:**
+
 - Add to: `types.ts`
 - Pattern: Export interfaces and enums from the single types file
 
 **New Utility/Helper:**
+
 - Create: `utils/helperName.ts` (directory does not yet exist -- create it)
 - Pattern: Named function exports
 
 **New CSS/Animations:**
+
 - Add to: `index.css` under the appropriate `@layer` (`base`, `components`, or `utilities`)
 
 ## Special Directories
 
 **`dist/`:**
+
 - Purpose: Vite production build output
 - Generated: Yes (via `npm run build`)
 - Committed: Yes (currently in repo -- should ideally be gitignored)
 
 **`.netlify/`:**
+
 - Purpose: Netlify CLI local development cache (function builds, edge function vendor files)
 - Generated: Yes (via `netlify dev` or `npm start`)
 - Committed: No (gitignored)
 
 **`node_modules/`:**
+
 - Purpose: npm dependencies
 - Generated: Yes (via `npm install`)
 - Committed: No (not in gitignore but standard practice)
 
 **`.planning/`:**
+
 - Purpose: GSD planning and codebase analysis documents
 - Generated: No (manually created)
 - Committed: Project-specific decision
 
 ---
 
-*Structure analysis: 2026-02-06*
+_Structure analysis: 2026-02-06_

@@ -77,7 +77,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **DEPL-01**: GitHub Actions CI pipeline (lint, type-check, test, build on PR)
 - [ ] **DEPL-02**: Netlify auto-deploy on merge to main
 - [ ] **DEPL-03**: Custom domain configured and pointing to Netlify
-- [ ] **DEPL-04**: SPA redirect configured in netlify.toml (/* → /index.html)
+- [ ] **DEPL-04**: SPA redirect configured in netlify.toml (/\* → /index.html)
 - [ ] **DEPL-05**: Professional README with project description, screenshots, tech stack, and setup instructions
 
 ### Bug Fixes
@@ -116,81 +116,83 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Live transcription during calls | Different product model, very high complexity |
-| Video recording/editing | Outside core competency |
-| Built-in video conferencing | Not differentiating, Zoom/Meet already won |
-| Unlimited storage | Unsustainable, localStorage has natural limits |
-| Real-time streaming transcription | Different architecture than upload workflow |
-| Team workspaces / collaboration | Requires auth + cloud, defer well past v2 |
-| Mobile native app | Web-first, responsive design sufficient |
+| Feature                           | Reason                                         |
+| --------------------------------- | ---------------------------------------------- |
+| Live transcription during calls   | Different product model, very high complexity  |
+| Video recording/editing           | Outside core competency                        |
+| Built-in video conferencing       | Not differentiating, Zoom/Meet already won     |
+| Unlimited storage                 | Unsustainable, localStorage has natural limits |
+| Real-time streaming transcription | Different architecture than upload workflow    |
+| Team workspaces / collaboration   | Requires auth + cloud, defer well past v2      |
+| Mobile native app                 | Web-first, responsive design sufficient        |
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| SEC-01 | Phase 1 | Complete |
-| SEC-02 | Phase 1 | Complete |
-| SEC-03 | Phase 1 | Complete |
-| SEC-04 | Phase 1 | Complete |
-| SEC-05 | Phase 1 | Complete |
-| SEC-06 | Phase 1 | Complete |
-| SEC-07 | Phase 1 | Complete |
-| SEC-08 | Phase 1 | Complete |
-| SEC-09 | Phase 1 | Complete |
-| PROJ-01 | Phase 5 | Pending |
-| PROJ-02 | Phase 5 | Pending |
-| PROJ-03 | Phase 5 | Pending |
-| PROJ-04 | Phase 5 | Pending |
-| PROJ-05 | Phase 3 | Pending |
-| PROJ-06 | Phase 3 | Pending |
-| PROJ-07 | Phase 3 | Pending |
-| PROJ-08 | Phase 3 | Pending |
-| PROJ-09 | Phase 3 | Pending |
-| TRNS-01 | Phase 6 | Pending |
-| TRNS-02 | Phase 6 | Pending |
-| TRNS-03 | Phase 6 | Pending |
-| TRNS-04 | Phase 6 | Pending |
-| TRNS-05 | Phase 6 | Pending |
-| TRNS-06 | Phase 6 | Pending |
-| TRNS-07 | Phase 6 | Pending |
-| ARCH-01 | Phase 4 | Pending |
-| ARCH-02 | Phase 4 | Pending |
-| ARCH-03 | Phase 4 | Pending |
-| ARCH-04 | Phase 4 | Pending |
-| ARCH-05 | Phase 4 | Pending |
-| ARCH-06 | Phase 4 | Pending |
-| ARCH-07 | Phase 4 | Pending |
-| UX-01 | Phase 7 | Pending |
-| UX-02 | Phase 7 | Pending |
-| UX-03 | Phase 7 | Pending |
-| UX-04 | Phase 7 | Pending |
-| UX-05 | Phase 7 | Pending |
-| UX-06 | Phase 7 | Pending |
-| UX-07 | Phase 7 | Pending |
-| QUAL-01 | Phase 2 | Pending |
-| QUAL-02 | Phase 2 | Pending |
-| QUAL-03 | Phase 2 | Pending |
-| QUAL-04 | Phase 2 | Pending |
-| QUAL-05 | Phase 2 | Pending |
-| QUAL-06 | Phase 8 | Pending |
-| QUAL-07 | Phase 8 | Pending |
-| QUAL-08 | Phase 8 | Pending |
-| DEPL-01 | Phase 2 | Pending |
-| DEPL-02 | Phase 9 | Pending |
-| DEPL-03 | Phase 9 | Pending |
-| DEPL-04 | Phase 9 | Pending |
-| DEPL-05 | Phase 9 | Pending |
-| BUG-01 | Phase 4 | Pending |
-| BUG-02 | Phase 4 | Pending |
-| BUG-03 | Phase 4 | Pending |
+| Requirement | Phase   | Status   |
+| ----------- | ------- | -------- |
+| SEC-01      | Phase 1 | Complete |
+| SEC-02      | Phase 1 | Complete |
+| SEC-03      | Phase 1 | Complete |
+| SEC-04      | Phase 1 | Complete |
+| SEC-05      | Phase 1 | Complete |
+| SEC-06      | Phase 1 | Complete |
+| SEC-07      | Phase 1 | Complete |
+| SEC-08      | Phase 1 | Complete |
+| SEC-09      | Phase 1 | Complete |
+| PROJ-01     | Phase 5 | Pending  |
+| PROJ-02     | Phase 5 | Pending  |
+| PROJ-03     | Phase 5 | Pending  |
+| PROJ-04     | Phase 5 | Pending  |
+| PROJ-05     | Phase 3 | Pending  |
+| PROJ-06     | Phase 3 | Pending  |
+| PROJ-07     | Phase 3 | Pending  |
+| PROJ-08     | Phase 3 | Pending  |
+| PROJ-09     | Phase 3 | Pending  |
+| TRNS-01     | Phase 6 | Pending  |
+| TRNS-02     | Phase 6 | Pending  |
+| TRNS-03     | Phase 6 | Pending  |
+| TRNS-04     | Phase 6 | Pending  |
+| TRNS-05     | Phase 6 | Pending  |
+| TRNS-06     | Phase 6 | Pending  |
+| TRNS-07     | Phase 6 | Pending  |
+| ARCH-01     | Phase 4 | Pending  |
+| ARCH-02     | Phase 4 | Pending  |
+| ARCH-03     | Phase 4 | Pending  |
+| ARCH-04     | Phase 4 | Pending  |
+| ARCH-05     | Phase 4 | Pending  |
+| ARCH-06     | Phase 4 | Pending  |
+| ARCH-07     | Phase 4 | Pending  |
+| UX-01       | Phase 7 | Pending  |
+| UX-02       | Phase 7 | Pending  |
+| UX-03       | Phase 7 | Pending  |
+| UX-04       | Phase 7 | Pending  |
+| UX-05       | Phase 7 | Pending  |
+| UX-06       | Phase 7 | Pending  |
+| UX-07       | Phase 7 | Pending  |
+| QUAL-01     | Phase 2 | Pending  |
+| QUAL-02     | Phase 2 | Pending  |
+| QUAL-03     | Phase 2 | Pending  |
+| QUAL-04     | Phase 2 | Pending  |
+| QUAL-05     | Phase 2 | Pending  |
+| QUAL-06     | Phase 8 | Pending  |
+| QUAL-07     | Phase 8 | Pending  |
+| QUAL-08     | Phase 8 | Pending  |
+| DEPL-01     | Phase 2 | Pending  |
+| DEPL-02     | Phase 9 | Pending  |
+| DEPL-03     | Phase 9 | Pending  |
+| DEPL-04     | Phase 9 | Pending  |
+| DEPL-05     | Phase 9 | Pending  |
+| BUG-01      | Phase 4 | Pending  |
+| BUG-02      | Phase 4 | Pending  |
+| BUG-03      | Phase 4 | Pending  |
 
 **Coverage:**
+
 - v1 requirements: 48 total
 - Mapped to phases: 48 (100%)
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-02-06*
-*Last updated: 2026-02-07 after Phase 1 completion*
+
+_Requirements defined: 2026-02-06_
+_Last updated: 2026-02-07 after Phase 1 completion_

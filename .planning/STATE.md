@@ -19,21 +19,23 @@ Progress: [███░░░░░░░] ~10% (3 plans of ~30+ estimated total
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 3
 - Average duration: ~1m 43s
 - Total execution time: ~0.09 hours
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-security-hardening | 3/3 | ~5m 29s | ~1m 50s |
+| Phase                 | Plans | Total   | Avg/Plan |
+| --------------------- | ----- | ------- | -------- |
+| 01-security-hardening | 3/3   | ~5m 29s | ~1m 50s  |
 
 **Recent Trend:**
+
 - Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s), 01-03 (2m 58s)
 - Trend: Stable (01-03 longer due to 4 files + build verification)
 
-*Updated after each plan completion*
+_Updated after each plan completion_
 
 ## Accumulated Context
 
@@ -64,13 +66,16 @@ None yet.
 ### Blockers/Concerns
 
 **Phase 1 (Security) -- RESOLVED:**
+
 - Browser extension attack surface: Malicious extensions can steal localStorage keys. This is accepted tradeoff for browser-based BYOK but should be documented in user-facing security guidance.
 - ~~Client code must be updated to send X-Gemini-Key header and use new /api/gemini-upload endpoint~~ (completed in 01-03)
 
 **Phase 3 (Storage):**
+
 - IndexedDB migration threshold: localStorage has ~5-10MB quota but exact limits vary by browser. Need to test with actual long transcripts to determine practical limits and migration trigger point.
 
 **Phase 6 (Transcription):**
+
 - Gemini API resumability: Need to verify whether Gemini's Files API supports resuming partial transcriptions mid-stream. If not supported, intermediate state persistence strategy may need adjustment.
 
 ## Session Continuity

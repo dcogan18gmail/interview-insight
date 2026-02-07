@@ -14,23 +14,27 @@ Set up ESLint, Prettier, pre-commit hooks, TypeScript strict mode, and CI pipeli
 ## Implementation Decisions
 
 ### Formatting & code style
+
 - Industry-standard defaults for React/TypeScript projects
 - 2-space indentation, single quotes, semicolons, 80-char line width
 - Prettier with Tailwind plugin for consistent formatting
 - Trailing commas in multi-line (ES5 style)
 
 ### Editor integration
+
 - User uses Cursor (VS Code-based)
 - Include `.vscode/settings.json` with format-on-save and ESLint auto-fix on save
 - Extensions recommendations for ESLint and Prettier
 
 ### Pre-commit behavior
+
 - Husky + lint-staged for pre-commit hooks
 - Commits are blocked if lint errors exist (strict gate)
 - lint-staged runs on staged files only (fast, not full repo)
 - Auto-fix formatting on commit (Prettier runs as part of lint-staged)
 
 ### Claude's Discretion
+
 - ESLint rule strictness and specific rule set choices (use recommended + React + TypeScript + accessibility plugins as specified in roadmap)
 - Prettier detailed config beyond the basics above
 - TypeScript strict mode migration approach (fix all errors vs incremental)
@@ -57,5 +61,5 @@ None — discussion stayed within phase scope
 
 ---
 
-*Phase: 02-development-tooling*
-*Context gathered: 2026-02-07*
+_Phase: 02-development-tooling_
+_Context gathered: 2026-02-07_

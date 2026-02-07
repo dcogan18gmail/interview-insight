@@ -5,12 +5,14 @@
 Based on analysis of the current Interview Insight codebase (React 18 + TypeScript + Vite + Tailwind + Netlify + Gemini), here's the recommended hardening stack for 2025/2026:
 
 **Critical Security Findings:**
+
 - API key currently exposed in Vite config
 - No XSS protection for transcript rendering
 - Missing security headers
 - No CSP implementation
 
 **Recommended Additions:**
+
 1. **Security:** DOMPurify, react-helmet-async, crypto-js, CSP headers
 2. **Testing:** Vitest + React Testing Library + Playwright
 3. **Linting:** ESLint 9 (flat config) + Prettier + strict TypeScript
@@ -22,6 +24,7 @@ Based on analysis of the current Interview Insight codebase (React 18 + TypeScri
 ## Current Stack Analysis
 
 **From package.json:**
+
 - `@google/genai`: "latest" — Should pin version
 - `@netlify/functions`: "^5.1.0" — Good
 - `docx`: "^9.0.0" — Good
@@ -31,6 +34,7 @@ Based on analysis of the current Interview Insight codebase (React 18 + TypeScri
 - `vite`: "^6.2.0" — Good (latest)
 
 **Issues Identified:**
+
 1. No testing framework
 2. No linting/formatting tools
 3. No security libraries
@@ -42,24 +46,28 @@ Based on analysis of the current Interview Insight codebase (React 18 + TypeScri
 ## Security Layer
 
 ### 1. Content Security Policy (CSP)
+
 **Package:** `react-helmet-async@^2.0.5`
 **Confidence:** 95%
 
 Prevents XSS attacks, controls resource loading, essential for BYOK model. Implement via Netlify headers in netlify.toml (preferred for production).
 
 ### 2. XSS Protection
+
 **Package:** `dompurify@^3.2.2`
 **Confidence:** 95%
 
 Sanitizes transcript content before rendering, battle-tested, zero dependencies.
 
 ### 3. BYOK Key Management
+
 **Package:** `crypto-js@^4.2.0`
 **Confidence:** 75%
 
 Encrypts API keys in localStorage (not perfect, but better than plaintext). Critical: remove API key from Vite config define block.
 
 ### 4. Dependency Scanning
+
 **Tools:** npm audit + GitHub Dependabot
 **Confidence:** 90%
 
@@ -68,6 +76,7 @@ Encrypts API keys in localStorage (not perfect, but better than plaintext). Crit
 ## Testing Layer
 
 ### 1. Unit/Component Testing
+
 **Framework:** `vitest@^3.0.0` + `@testing-library/react@^16.1.0`
 **Confidence:** 95%
 
@@ -78,6 +87,7 @@ Additional deps: `@testing-library/jest-dom@^6.6.3`, `@testing-library/user-even
 **What NOT to use:** Jest (slower for Vite, complex config)
 
 ### 2. End-to-End Testing
+
 **Framework:** `playwright@^1.50.0`
 **Confidence:** 90%
 
@@ -88,6 +98,7 @@ Why Playwright: Tests real browsers, works with Netlify Functions, better TypeSc
 ## Linting & Formatting Layer
 
 ### 1. ESLint 9 (Flat Config)
+
 **Package:** `eslint@^9.18.0`
 **Confidence:** 95%
 
@@ -96,14 +107,17 @@ Additional: `@typescript-eslint/eslint-plugin@^8.21.0`, `@typescript-eslint/pars
 **What NOT to use:** ESLint 8 .eslintrc (deprecated)
 
 ### 2. Prettier
+
 **Package:** `prettier@^3.4.2` + `prettier-plugin-tailwindcss@^0.6.9`
 **Confidence:** 100%
 
 ### 3. TypeScript Strict Mode
+
 Enable strict, noUncheckedIndexedAccess, noImplicitReturns, noFallthroughCasesInSwitch.
 **Confidence:** 90%
 
 ### 4. Pre-commit Hooks
+
 **Tools:** `husky@^9.1.7` + `lint-staged@^15.2.11`
 **Confidence:** 95%
 
@@ -112,14 +126,17 @@ Enable strict, noUncheckedIndexedAccess, noImplicitReturns, noFallthroughCasesIn
 ## CI/CD Layer
 
 ### 1. GitHub Actions
+
 **Confidence:** 95%
 
 Workflow: lint, type-check, test, build, security audit on PR. Deploy to Netlify on main merge.
 
 ### 2. Netlify Configuration
+
 Security headers in netlify.toml: X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Content-Security-Policy.
 
 ### 3. Code Coverage
+
 Vitest + Codecov integration.
 
 ---
@@ -174,5 +191,5 @@ Versioned storage schema with migration support. Handle QuotaExceededError. Sing
 
 ---
 
-*Research Date: 2026-02-06*
-*Researcher: Claude Sonnet 4.5*
+_Research Date: 2026-02-06_
+_Researcher: Claude Sonnet 4.5_

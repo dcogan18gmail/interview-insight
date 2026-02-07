@@ -1,6 +1,6 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import { TranscriptSegment } from "../types";
-import { getDecryptedKey } from "./cryptoService";
+import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
+import { TranscriptSegment } from '../types';
+import { getDecryptedKey } from './cryptoService';
 
 /**
  * Create a GoogleGenAI client using the decrypted API key from localStorage.
@@ -9,7 +9,9 @@ import { getDecryptedKey } from "./cryptoService";
 const createAI = async (): Promise<GoogleGenAI> => {
   const apiKey = await getDecryptedKey();
   if (!apiKey) {
-    throw new Error("No API key configured. Please add your Gemini API key in Settings.");
+    throw new Error(
+      'No API key configured. Please add your Gemini API key in Settings.'
+    );
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -17,9 +19,11 @@ const createAI = async (): Promise<GoogleGenAI> => {
 const MODEL_NAME = 'gemini-3-pro-preview';
 
 // Helper to parse JSONL from the stream buffer
-const parseBuffer = (buffer: string): { segments: TranscriptSegment[], remainingBuffer: string } => {
+const parseBuffer = (
+  buffer: string
+): { segments: TranscriptSegment[]; remainingBuffer: string } => {
   const lines = buffer.split('\n');
-  const remainingBuffer = lines.pop() || ""; // Keep the last partial line
+  const remainingBuffer = lines.pop() || ''; // Keep the last partial line
   const segments: TranscriptSegment[] = [];
 
   for (const line of lines) {
@@ -27,16 +31,20 @@ const parseBuffer = (buffer: string): { segments: TranscriptSegment[], remaining
     if (!trimmedLine) continue;
     try {
       // Clean up potential JSON formatting artifacts
-      const jsonStr = trimmedLine.replace(/,$/, '').replace(/^\[/, '').replace(/\]$/, '');
+      const jsonStr = trimmedLine
+        .replace(/,$/, '')
+        .replace(/^\[/, '')
+        .replace(/\]$/, '');
       const segment: TranscriptSegment = JSON.parse(jsonStr);
 
       // Basic validation
       if (segment.speaker && (segment.englishText || segment.originalText)) {
         // Ensure timestamp is a number
-        segment.timestamp = typeof segment.timestamp === 'number' ? segment.timestamp : 0;
+        segment.timestamp =
+          typeof segment.timestamp === 'number' ? segment.timestamp : 0;
         segments.push(segment);
       }
-    } catch (e) {
+    } catch (_e) {
       // Ignore non-JSON lines (preambles, thoughts, code blocks)
     }
   }
@@ -44,33 +52,41 @@ const parseBuffer = (buffer: string): { segments: TranscriptSegment[], remaining
 };
 
 // Helper to checking overlap
-const isDuplicate = (newSegment: TranscriptSegment, existingSegments: TranscriptSegment[]): boolean => {
+const isDuplicate = (
+  newSegment: TranscriptSegment,
+  existingSegments: TranscriptSegment[]
+): boolean => {
   if (existingSegments.length === 0) return false;
 
   // Check against the last 50 segments (approx 5-10 mins of conversation)
   const lookback = existingSegments.slice(-50);
 
-  const newText = (newSegment.originalText || "").trim().toLowerCase();
-  const newEnglish = (newSegment.englishText || "").trim().toLowerCase();
+  const newText = (newSegment.originalText || '').trim().toLowerCase();
+  const newEnglish = (newSegment.englishText || '').trim().toLowerCase();
 
   // Ignore very short segments (e.g. "Yes", "No") from duplicate checks to avoid false positives
   if (newText.length < 10 && newEnglish.length < 10) return false;
 
-  return lookback.some(existing => {
-    const existingText = (existing.originalText || "").trim().toLowerCase();
-    const existingEnglish = (existing.englishText || "").trim().toLowerCase();
+  return lookback.some((existing) => {
+    const existingText = (existing.originalText || '').trim().toLowerCase();
+    const existingEnglish = (existing.englishText || '').trim().toLowerCase();
 
     // Exact match or high similarity
     return existingText === newText || existingEnglish === newEnglish;
   });
 };
 
-export const uploadFile = async (file: File, onUploadProgress: (progress: number) => void): Promise<string> => {
+export const uploadFile = async (
+  file: File,
+  onUploadProgress: (progress: number) => void
+): Promise<string> => {
   try {
     // Decrypt user's API key for BYOK
     const apiKey = await getDecryptedKey();
     if (!apiKey) {
-      throw new Error("No API key configured. Please add your Gemini API key in Settings.");
+      throw new Error(
+        'No API key configured. Please add your Gemini API key in Settings.'
+      );
     }
 
     // 1. Get Upload URL from Netlify Function (v2 path, BYOK header)
@@ -83,8 +99,8 @@ export const uploadFile = async (file: File, onUploadProgress: (progress: number
       body: JSON.stringify({
         name: file.name,
         size: file.size,
-        mimeType: file.type
-      })
+        mimeType: file.type,
+      }),
     });
 
     if (!response.ok) {
@@ -116,9 +132,9 @@ export const uploadFile = async (file: File, onUploadProgress: (progress: number
           'Content-Range': `bytes ${offset}-${offset + chunk.size - 1}/${totalBytes}`,
           'X-Goog-Upload-Command': command,
           'X-Goog-Upload-Offset': offset.toString(),
-          'Content-Type': 'application/octet-stream'
+          'Content-Type': 'application/octet-stream',
         },
-        body: arrayBuffer
+        body: arrayBuffer,
       });
 
       if (!proxyResponse.ok) {
@@ -136,10 +152,9 @@ export const uploadFile = async (file: File, onUploadProgress: (progress: number
       onUploadProgress(Math.min(percentComplete, 99));
     }
 
-    throw new Error("Upload loop finished without returning URI");
-
+    throw new Error('Upload loop finished without returning URI');
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error('Upload error:', error);
     throw error;
   }
 };
@@ -148,10 +163,12 @@ export const generateTranscript = async (
   fileUri: string,
   mimeType: string,
   durationSeconds: number,
-  onProgress: (percentage: number, currentSegment: TranscriptSegment | null) => void
+  onProgress: (
+    percentage: number,
+    currentSegment: TranscriptSegment | null
+  ) => void
 ): Promise<TranscriptSegment[]> => {
-
-  let allSegments: TranscriptSegment[] = [];
+  const allSegments: TranscriptSegment[] = [];
   let currentStartTime = 0;
   let isComplete = false;
   let retryCount = 0;
@@ -168,14 +185,14 @@ export const generateTranscript = async (
 
       // HARD EXIT: If we are effectively at the end of the file, stop.
       if (durationSeconds > 0 && currentStartTime >= durationSeconds - 2) {
-        console.log("[GeminiService] Reached end of file duration. Finishing.");
+        console.log('[GeminiService] Reached end of file duration. Finishing.');
         isComplete = true;
         break;
       }
 
       // Prepare Context for "Seeking"
       const lastSegments = allSegments.slice(-5); // Increase context to last 5 segments
-      const contextText = lastSegments.map(s => s.originalText).join(" ... ");
+      const contextText = lastSegments.map((s) => s.originalText).join(' ... ');
       const isContinuation = allSegments.length > 0;
 
       const promptText = `
@@ -186,14 +203,16 @@ export const generateTranscript = async (
         ${isContinuation ? `- RESUME FROM: ${Math.round(currentStartTime)} seconds.` : ''}
         
         TASK:
-        ${isContinuation
-          ? `
+        ${
+          isContinuation
+            ? `
             We are resuming transcription.
             1. Start listening at timestamp ${Math.round(currentStartTime)}.
             2. Verify context: The last spoken words were: "...${contextText.slice(-200)}"
             3. Transcribe the NEW content that follows immediately.
             `
-          : `Transcribe the audio file from the beginning.`}
+            : `Transcribe the audio file from the beginning.`
+        }
         
         CRITICAL INSTRUCTIONS:
         - CONTINUOUS OUTPUT: Transcribe as much as possible in a single response. Do NOT stop after a few sentences. Aim to transcribe until the end of the file or until you hit the token limit.
@@ -215,29 +234,28 @@ export const generateTranscript = async (
         {"speaker": "Guest", "originalText": "Bonjour.", "englishText": "Hello.", "timestamp": 120.5}
       `;
 
-      console.log(`[GeminiService] Loop ${loopCount}: Starting from approx ${currentStartTime}s`);
+      console.log(
+        `[GeminiService] Loop ${loopCount}: Starting from approx ${currentStartTime}s`
+      );
 
       try {
         const stream = await aiClient.models.generateContentStream({
           model: MODEL_NAME,
           contents: {
-            parts: [
-              { fileData: { fileUri, mimeType } },
-              { text: promptText },
-            ],
+            parts: [{ fileData: { fileUri, mimeType } }, { text: promptText }],
           },
           config: {
             maxOutputTokens: 65536,
             temperature: 0.3, // Slight increase to avoid "stuck" repetitive states
-          }
+          },
         });
 
-        let buffer = "";
+        let buffer = '';
         let segmentsInThisChunk = 0;
         let lastSegmentInChunk: TranscriptSegment | null = null;
 
         for await (const chunk of stream) {
-          const chunkText = (chunk as GenerateContentResponse).text || "";
+          const chunkText = (chunk as GenerateContentResponse).text || '';
           buffer += chunkText;
 
           const { segments, remainingBuffer } = parseBuffer(buffer);
@@ -250,7 +268,10 @@ export const generateTranscript = async (
             }
 
             // Timestamp Safety: If a segment claims to be from the distant past (e.g. start of file), ignore it
-            if (isContinuation && (segment.timestamp || 0) < (currentStartTime - 30)) {
+            if (
+              isContinuation &&
+              (segment.timestamp || 0) < currentStartTime - 30
+            ) {
               continue;
             }
 
@@ -259,9 +280,15 @@ export const generateTranscript = async (
             segmentsInThisChunk++;
 
             // Progress Update
-            const percentage = durationSeconds > 0
-              ? Math.min(Math.round(((segment.timestamp || 0) / durationSeconds) * 100), 99)
-              : 99;
+            const percentage =
+              durationSeconds > 0
+                ? Math.min(
+                    Math.round(
+                      ((segment.timestamp || 0) / durationSeconds) * 100
+                    ),
+                    99
+                  )
+                : 99;
             onProgress(percentage, segment);
           }
         }
@@ -269,14 +296,20 @@ export const generateTranscript = async (
         // Process any remaining buffer
         if (buffer.trim()) {
           try {
-            const jsonStr = buffer.trim().replace(/,$/, '').replace(/^\[/, '').replace(/\]$/, '');
+            const jsonStr = buffer
+              .trim()
+              .replace(/,$/, '')
+              .replace(/^\[/, '')
+              .replace(/\]$/, '');
             const segment = JSON.parse(jsonStr);
             if (!isDuplicate(segment, allSegments)) {
               allSegments.push(segment);
               lastSegmentInChunk = segment;
               segmentsInThisChunk++;
             }
-          } catch (e) { }
+          } catch (_e) {
+            // Skip malformed JSON segments
+          }
         }
 
         // --- LOOP CONTROL LOGIC ---
@@ -284,22 +317,27 @@ export const generateTranscript = async (
         if (segmentsInThisChunk === 0) {
           // Check if we are near the end. If so, this lack of data likely means "Silence / End of File".
           const remainingTime = durationSeconds - currentStartTime;
-          const progressRatio = durationSeconds > 0 ? currentStartTime / durationSeconds : 0;
+          const progressRatio =
+            durationSeconds > 0 ? currentStartTime / durationSeconds : 0;
 
           // Strict completion check to prevent truncation
           if (remainingTime < 10 || progressRatio > 0.99) {
-            console.log("[GeminiService] No new segments near end of file. Assuming completion.");
+            console.log(
+              '[GeminiService] No new segments near end of file. Assuming completion.'
+            );
             isComplete = true;
             break;
           }
 
           // If we are in the middle of the file, this is likely an error or timeout. Retry.
-          console.warn("[GeminiService] No NEW segments received mid-file. Retrying...");
+          console.warn(
+            '[GeminiService] No NEW segments received mid-file. Retrying...'
+          );
           retryCount++;
           currentStartTime += 5; // Small nudge to get past a potential glitch, but minimize skipping
 
           if (retryCount > MAX_RETRIES) {
-            console.error("Max retries reached with no progress.");
+            console.error('Max retries reached with no progress.');
             break;
           }
           continue;
@@ -310,7 +348,9 @@ export const generateTranscript = async (
         const lastTimestamp = lastSegmentInChunk?.timestamp || 0;
         const timeLeft = durationSeconds - lastTimestamp;
 
-        console.log(`[GeminiService] Chunk ended at ${lastTimestamp}s. Time remaining: ${timeLeft}s`);
+        console.log(
+          `[GeminiService] Chunk ended at ${lastTimestamp}s. Time remaining: ${timeLeft}s`
+        );
 
         if (timeLeft < 10) {
           isComplete = true;
@@ -318,9 +358,8 @@ export const generateTranscript = async (
           // Update start time for next loop
           currentStartTime = lastTimestamp;
         }
-
       } catch (innerError) {
-        console.error("Error in chunk generation:", innerError);
+        console.error('Error in chunk generation:', innerError);
         retryCount++;
         if (retryCount > MAX_RETRIES) throw innerError;
       }
@@ -331,9 +370,8 @@ export const generateTranscript = async (
       onProgress(100, allSegments[allSegments.length - 1]);
     }
     return allSegments;
-
   } catch (error) {
-    console.error("Gemini Transcription Fatal Error:", error);
+    console.error('Gemini Transcription Fatal Error:', error);
     throw error;
   }
 };
