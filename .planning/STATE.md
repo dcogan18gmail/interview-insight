@@ -4,36 +4,37 @@
 
 See: .planning/PROJECT.md (updated 2026-02-06)
 
-**Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis — with full visibility into the process.
-**Current focus:** Phase 1 - Security Hardening (COMPLETE)
+**Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
+**Current focus:** Phase 2 - Development Tooling (IN PROGRESS)
 
 ## Current Position
 
-Phase: 1 of 9 (Security Hardening)
-Plan: 3 of 3
-Status: Phase complete
-Last activity: 2026-02-07 — Completed 01-03-PLAN.md (Client-Side BYOK Integration)
+Phase: 2 of 9 (Development Tooling)
+Plan: 1 of 2
+Status: In progress
+Last activity: 2026-02-07 -- Completed 02-01-PLAN.md (ESLint + Prettier Setup)
 
-Progress: [███░░░░░░░] ~10% (3 plans of ~30+ estimated total)
+Progress: [████░░░░░░] ~13% (4 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
-- Average duration: ~1m 43s
-- Total execution time: ~0.09 hours
+- Total plans completed: 4
+- Average duration: ~2m 27s
+- Total execution time: ~0.16 hours
 
 **By Phase:**
 
-| Phase                 | Plans | Total   | Avg/Plan |
-| --------------------- | ----- | ------- | -------- |
-| 01-security-hardening | 3/3   | ~5m 29s | ~1m 50s  |
+| Phase                    | Plans | Total    | Avg/Plan |
+| ------------------------ | ----- | -------- | -------- |
+| 01-security-hardening    | 3/3   | ~5m 29s  | ~1m 50s  |
+| 02-development-tooling   | 1/2   | ~4m 18s  | ~4m 18s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s), 01-03 (2m 58s)
-- Trend: Stable (01-03 longer due to 4 files + build verification)
+- Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s), 01-03 (2m 58s), 02-01 (4m 18s)
+- Trend: 02-01 longer due to npm install (218 packages) + formatting 48 files + 9 lint fixes
 
 _Updated after each plan completion_
 
@@ -58,6 +59,9 @@ Recent decisions affecting current work:
 - Validate API key before encrypting and storing: Prevents invalid keys in storage (01-03)
 - Async createAI() replaces sync getAI() singleton: Fresh instance per transcription, supports key changes (01-03)
 - Removed loadEnv from vite.config.ts: Only used for API key injection, no longer needed (01-03)
+- ESLint 9.39.2 pinned exactly (NOT ESLint 10) for typescript-eslint compatibility (02-01)
+- caughtErrorsIgnorePattern added to no-unused-vars for underscore-prefixed catch params (02-01)
+- Accessibility fix: added keyboard listener and role to download menu overlay in TranscriptView (02-01)
 
 ### Pending Todos
 
@@ -80,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07T17:56:09Z
-Stopped at: Completed 01-03-PLAN.md (Client-Side BYOK Integration) -- Phase 1 complete
+Last session: 2026-02-07T20:36:57Z
+Stopped at: Completed 02-01-PLAN.md (ESLint + Prettier Setup)
 Resume file: None
