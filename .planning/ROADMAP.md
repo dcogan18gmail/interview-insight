@@ -51,10 +51,11 @@ Plans:
   3. Pre-commit hooks via Husky prevent committing unlinted/unformatted code
   4. TypeScript strict mode is enabled and codebase compiles without errors
   5. GitHub Actions CI pipeline runs lint and type-check on every PR
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — ESLint 9 + Prettier config, editor integration, initial formatting pass
+- [ ] 02-02-PLAN.md — TypeScript strict mode, dependency pinning, Husky + lint-staged, CI pipeline
 
 ### Phase 3: Storage Foundation
 **Goal**: Persistent storage is reliable, versioned, and handles edge cases gracefully
@@ -171,7 +172,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security Hardening | 3/3 | Complete | 2026-02-07 |
-| 2. Development Tooling | 0/TBD | Not started | - |
+| 2. Development Tooling | 0/2 | Not started | - |
 | 3. Storage Foundation | 0/TBD | Not started | - |
 | 4. Core Architecture Refactor | 0/TBD | Not started | - |
 | 5. Multi-Project Dashboard | 0/TBD | Not started | - |
