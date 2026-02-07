@@ -34,10 +34,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Edge function proxy validates URLs (only Google APIs) and restricts CORS to app domain
   4. Security headers (CSP, X-Frame-Options, HSTS, etc.) are configured in netlify.toml
   5. Error messages shown to users are sanitized with no raw API errors or stack traces
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Crypto service (AES-GCM encryption) + security headers in netlify.toml
+- [ ] 01-02-PLAN.md — Harden server functions (CORS, SSRF, rate limiting, error sanitization, BYOK header)
+- [ ] 01-03-PLAN.md — Settings UI + remove embedded key + rewire app for BYOK
 
 ### Phase 2: Development Tooling
 **Goal**: Development environment supports quality work and prevents common errors
@@ -168,7 +170,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security Hardening | 0/TBD | Not started | - |
+| 1. Security Hardening | 0/3 | Planned | - |
 | 2. Development Tooling | 0/TBD | Not started | - |
 | 3. Storage Foundation | 0/TBD | Not started | - |
 | 4. Core Architecture Refactor | 0/TBD | Not started | - |
