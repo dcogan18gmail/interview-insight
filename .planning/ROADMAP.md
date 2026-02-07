@@ -12,7 +12,7 @@ Interview Insight transforms from a working 2-user prototype into a hardened, pu
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Security Hardening** - BYOK model with encrypted storage, secure proxy, comprehensive headers
+- [x] **Phase 1: Security Hardening** - BYOK model with encrypted storage, secure proxy, comprehensive headers
 - [ ] **Phase 2: Development Tooling** - ESLint, Prettier, pre-commit hooks, TypeScript strict mode
 - [ ] **Phase 3: Storage Foundation** - Versioned localStorage with migrations, quota handling, corruption recovery
 - [ ] **Phase 4: Core Architecture Refactor** - Decompose App.tsx into modules, extract hooks, fix memory leaks
@@ -37,9 +37,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Crypto service (AES-GCM encryption) + security headers in netlify.toml
-- [ ] 01-02-PLAN.md — Harden server functions (CORS, SSRF, rate limiting, error sanitization, BYOK header)
-- [ ] 01-03-PLAN.md — Settings UI + remove embedded key + rewire app for BYOK
+- [x] 01-01-PLAN.md — Crypto service (AES-GCM encryption) + security headers in netlify.toml
+- [x] 01-02-PLAN.md — Harden server functions (CORS, SSRF, rate limiting, error sanitization, BYOK header)
+- [x] 01-03-PLAN.md — Settings UI + remove embedded key + rewire app for BYOK
 
 ### Phase 2: Development Tooling
 **Goal**: Development environment supports quality work and prevents common errors
@@ -170,7 +170,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security Hardening | 0/3 | Planned | - |
+| 1. Security Hardening | 3/3 | Complete | 2026-02-07 |
 | 2. Development Tooling | 0/TBD | Not started | - |
 | 3. Storage Foundation | 0/TBD | Not started | - |
 | 4. Core Architecture Refactor | 0/TBD | Not started | - |

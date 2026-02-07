@@ -9,15 +9,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Security
 
-- [ ] **SEC-01**: User can provide their own Gemini API key via a settings page
-- [ ] **SEC-02**: API key is encrypted before storing in localStorage (Web Crypto AES-GCM)
-- [ ] **SEC-03**: API key is validated against Gemini API on entry (lightweight test call)
-- [ ] **SEC-04**: Embedded/build-time API key is completely removed from codebase
-- [ ] **SEC-05**: Edge function CORS restricted to app domain (no wildcard)
-- [ ] **SEC-06**: Upload proxy validates target URL (only allows Google API endpoints, prevents SSRF)
-- [ ] **SEC-07**: Security headers configured in netlify.toml (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
-- [ ] **SEC-08**: Error messages sanitized — no raw API errors or stack traces returned to client
-- [ ] **SEC-09**: Rate limiting or abuse protection on serverless function endpoints
+- [x] **SEC-01**: User can provide their own Gemini API key via a settings page
+- [x] **SEC-02**: API key is encrypted before storing in localStorage (Web Crypto AES-GCM)
+- [x] **SEC-03**: API key is validated against Gemini API on entry (lightweight test call)
+- [x] **SEC-04**: Embedded/build-time API key is completely removed from codebase
+- [x] **SEC-05**: Edge function CORS restricted to app domain (no wildcard)
+- [x] **SEC-06**: Upload proxy validates target URL (only allows Google API endpoints, prevents SSRF)
+- [x] **SEC-07**: Security headers configured in netlify.toml (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- [x] **SEC-08**: Error messages sanitized — no raw API errors or stack traces returned to client
+- [x] **SEC-09**: Rate limiting or abuse protection on serverless function endpoints
 
 ### Project Management
 
@@ -130,15 +130,15 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 1 | Pending |
-| SEC-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
-| SEC-04 | Phase 1 | Pending |
-| SEC-05 | Phase 1 | Pending |
-| SEC-06 | Phase 1 | Pending |
-| SEC-07 | Phase 1 | Pending |
-| SEC-08 | Phase 1 | Pending |
-| SEC-09 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | Complete |
+| SEC-02 | Phase 1 | Complete |
+| SEC-03 | Phase 1 | Complete |
+| SEC-04 | Phase 1 | Complete |
+| SEC-05 | Phase 1 | Complete |
+| SEC-06 | Phase 1 | Complete |
+| SEC-07 | Phase 1 | Complete |
+| SEC-08 | Phase 1 | Complete |
+| SEC-09 | Phase 1 | Complete |
 | PROJ-01 | Phase 5 | Pending |
 | PROJ-02 | Phase 5 | Pending |
 | PROJ-03 | Phase 5 | Pending |
@@ -193,4 +193,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-06*
-*Last updated: 2026-02-06 after roadmap creation*
+*Last updated: 2026-02-07 after Phase 1 completion*
