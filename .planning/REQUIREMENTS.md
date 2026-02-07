@@ -25,11 +25,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PROJ-02**: User can create a new project (triggers upload flow)
 - [ ] **PROJ-03**: User can rename a project
 - [ ] **PROJ-04**: User can delete a project (with confirmation)
-- [ ] **PROJ-05**: Project state persists in localStorage across page refresh and browser close
-- [ ] **PROJ-06**: localStorage schema is versioned with migration support
-- [ ] **PROJ-07**: App handles localStorage quota exceeded gracefully (clear error message)
-- [ ] **PROJ-08**: App handles corrupted localStorage data without crashing (fallback to defaults)
-- [ ] **PROJ-09**: Project metadata stored separately from transcript data (lazy loading)
+- [x] **PROJ-05**: Project state persists in localStorage across page refresh and browser close
+- [x] **PROJ-06**: localStorage schema is versioned with migration support
+- [x] **PROJ-07**: App handles localStorage quota exceeded gracefully (clear error message)
+- [x] **PROJ-08**: App handles corrupted localStorage data without crashing (fallback to defaults)
+- [x] **PROJ-09**: Project metadata stored separately from transcript data (lazy loading)
 
 ### Transcription
 
@@ -143,11 +143,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | PROJ-02     | Phase 5 | Pending  |
 | PROJ-03     | Phase 5 | Pending  |
 | PROJ-04     | Phase 5 | Pending  |
-| PROJ-05     | Phase 3 | Pending  |
-| PROJ-06     | Phase 3 | Pending  |
-| PROJ-07     | Phase 3 | Pending  |
-| PROJ-08     | Phase 3 | Pending  |
-| PROJ-09     | Phase 3 | Pending  |
+| PROJ-05     | Phase 3 | Complete |
+| PROJ-06     | Phase 3 | Complete |
+| PROJ-07     | Phase 3 | Complete |
+| PROJ-08     | Phase 3 | Complete |
+| PROJ-09     | Phase 3 | Complete |
 | TRNS-01     | Phase 6 | Pending  |
 | TRNS-02     | Phase 6 | Pending  |
 | TRNS-03     | Phase 6 | Pending  |
@@ -195,4 +195,4 @@ Deferred to future release. Tracked but not in current roadmap.
 ---
 
 _Requirements defined: 2026-02-06_
-_Last updated: 2026-02-07 after Phase 2 completion_
+_Last updated: 2026-02-07 after Phase 3 completion_
