@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 3 - Storage Foundation (IN PROGRESS)
+**Current focus:** Phase 3 - Storage Foundation (COMPLETE)
 
 ## Current Position
 
 Phase: 3 of 9 (Storage Foundation)
-Plan: 1 of 2
-Status: In progress
-Last activity: 2026-02-07 -- Completed 03-01-PLAN.md (Storage Type Definitions and Core Primitives)
+Plan: 2 of 2
+Status: Phase complete
+Last activity: 2026-02-07 -- Completed 03-02-PLAN.md (Project and Transcript CRUD with Debounced Writes)
 
-Progress: [██████░░░░] ~20% (6 plans of ~30+ estimated total)
+Progress: [███████░░░] ~23% (7 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 6
-- Average duration: ~2m 41s
-- Total execution time: ~0.27 hours
+- Total plans completed: 7
+- Average duration: ~2m 48s
+- Total execution time: ~0.33 hours
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: [██████░░░░] ~20% (6 plans of ~30+ estimated total
 | ---------------------- | ----- | ------- | -------- |
 | 01-security-hardening  | 3/3   | ~5m 29s | ~1m 50s  |
 | 02-development-tooling | 2/2   | ~7m 43s | ~3m 52s  |
-| 03-storage-foundation  | 1/2   | ~2m 50s | ~2m 50s  |
+| 03-storage-foundation  | 2/2   | ~6m 10s | ~3m 05s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-03 (2m 58s), 02-01 (4m 18s), 02-02 (3m 25s), 03-01 (2m 50s)
-- Trend: Phase 3 faster -- pure TypeScript, no npm installs or config changes
+- Last 5 plans: 02-01 (4m 18s), 02-02 (3m 25s), 03-01 (2m 50s), 03-02 (3m 20s)
+- Trend: Consistent ~3min per plan for recent work
 
 _Updated after each plan completion_
 
@@ -72,6 +72,12 @@ Recent decisions affecting current work:
 - Corrupted localStorage keys removed on read failure, return null not throw (03-01)
 - Cross-browser quota detection: DOMException code 22/1014, QuotaExceededError, NS_ERROR_DOM_QUOTA_REACHED (03-01)
 - ParseResult<T> discriminated union over boolean type guards for consistent error reporting (03-01)
+- saveProject defaults to debounced (300ms) with immediate=true override for critical writes (03-02)
+- createProject always persists immediately (immediate=true) (03-02)
+- deleteProject removes both metadata entry AND transcript key atomically (03-02)
+- saveTranscript syncs segmentCount back to project metadata (03-02)
+- beforeunload listener guarded with typeof window check for SSR safety (03-02)
+- cleanupOrphanedTranscripts iterates localStorage in reverse for safe removal during iteration (03-02)
 
 ### Pending Todos
 
@@ -84,7 +90,7 @@ None yet.
 - Browser extension attack surface: Malicious extensions can steal localStorage keys. This is accepted tradeoff for browser-based BYOK but should be documented in user-facing security guidance.
 - ~~Client code must be updated to send X-Gemini-Key header and use new /api/gemini-upload endpoint~~ (completed in 01-03)
 
-**Phase 3 (Storage):**
+**Phase 3 (Storage) -- COMPLETE:**
 
 - IndexedDB migration threshold: localStorage has ~5-10MB quota but exact limits vary by browser. Need to test with actual long transcripts to determine practical limits and migration trigger point.
 
@@ -94,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07T23:26:48Z
-Stopped at: Completed 03-01-PLAN.md (Storage Type Definitions and Core Primitives)
+Last session: 2026-02-07T23:34:09Z
+Stopped at: Completed 03-02-PLAN.md (Project and Transcript CRUD with Debounced Writes) -- Phase 3 complete
 Resume file: None
