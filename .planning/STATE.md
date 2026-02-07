@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 1 of 9 (Security Hardening)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-07 — Completed 01-01-PLAN.md (Crypto Service + Security Headers)
+Last activity: 2026-02-07 — Completed 01-02-PLAN.md (Server-Side Security Hardening)
 
-Progress: [█░░░░░░░░░] ~3% (1 plan of ~30+ estimated total)
+Progress: [██░░░░░░░░] ~7% (2 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 1m 19s
-- Total execution time: ~0.02 hours
+- Total plans completed: 2
+- Average duration: ~1m 10s
+- Total execution time: ~0.04 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-security-hardening | 1/3 | 1m 19s | 1m 19s |
+| 01-security-hardening | 2/3 | ~2m 31s | ~1m 16s |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (1m 19s)
-- Trend: N/A (first plan)
+- Last 5 plans: 01-01 (1m 19s), 01-02 (1m 12s)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -48,6 +48,11 @@ Recent decisions affecting current work:
 - PBKDF2 100k iterations for key derivation: Balances security with browser performance (01-01)
 - App-generated passphrase (not user-provided): Simpler UX, encryption-at-rest protects against raw localStorage exfiltration (01-01)
 - CSP allows unsafe-inline for style-src: Required by Tailwind CSS inline styles (01-01)
+- CORS restricted to explicit origin allowlist (no wildcard): Prevents unauthorized cross-origin access (01-02)
+- SSRF prevention via URL hostname/protocol/path validation on proxy: Only forwards to generativelanguage.googleapis.com (01-02)
+- BYOK via X-Gemini-Key request header with env var fallback: Enables per-user keys while preserving backward compat (01-02)
+- Rate limits: 100/60s for proxy-upload, 20/60s for gemini-upload (01-02)
+- Migrated gemini-upload to Netlify Functions v2 format: Required for rate limiting config (01-02)
 
 ### Pending Todos
 
@@ -57,7 +62,7 @@ None yet.
 
 **Phase 1 (Security):**
 - Browser extension attack surface: Malicious extensions can steal localStorage keys. This is accepted tradeoff for browser-based BYOK but should be documented in user-facing security guidance.
-- Pre-existing TS errors in netlify/edge-functions/proxy-upload.ts and netlify/functions/gemini-upload.ts (missing type declarations). Not blocking but noted.
+- Client code must be updated to send X-Gemini-Key header and use new /api/gemini-upload endpoint (addressed in 01-03)
 
 **Phase 3 (Storage):**
 - IndexedDB migration threshold: localStorage has ~5-10MB quota but exact limits vary by browser. Need to test with actual long transcripts to determine practical limits and migration trigger point.
@@ -67,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07T17:47:38Z
-Stopped at: Completed 01-01-PLAN.md (Crypto Service + Security Headers)
+Last session: 2026-02-07T17:48:34Z
+Stopped at: Completed 01-02-PLAN.md (Server-Side Security Hardening)
 Resume file: None
