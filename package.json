@@ -14,32 +14,32 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@google/genai": "latest",
-    "@netlify/functions": "^5.1.0",
-    "docx": "^9.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@google/genai": "1.30.0",
+    "@netlify/functions": "5.1.0",
+    "docx": "9.5.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
-    "@types/node": "^22.14.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.0",
+    "@types/node": "22.19.1",
+    "@types/react": "18.3.27",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "5.1.1",
+    "autoprefixer": "10.4.22",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "globals": "17.3.0",
-    "netlify-cli": "^23.11.1",
-    "postcss": "^8.4.0",
+    "netlify-cli": "23.11.1",
+    "postcss": "8.5.6",
     "prettier": "3.8.1",
     "prettier-plugin-tailwindcss": "0.7.2",
-    "tailwindcss": "^3.4.0",
-    "typescript": "~5.8.2",
+    "tailwindcss": "3.4.18",
+    "typescript": "5.8.3",
     "typescript-eslint": "8.54.0",
-    "vite": "^6.2.0"
+    "vite": "6.4.1"
   }
 }

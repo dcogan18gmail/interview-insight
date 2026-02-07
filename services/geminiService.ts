@@ -367,7 +367,10 @@ export const generateTranscript = async (
 
     // Final 100% update
     if (allSegments.length > 0) {
-      onProgress(100, allSegments[allSegments.length - 1]);
+      const lastSegment = allSegments[allSegments.length - 1];
+      if (lastSegment) {
+        onProgress(100, lastSegment);
+      }
     }
     return allSegments;
   } catch (error) {
