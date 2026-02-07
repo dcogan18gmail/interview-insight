@@ -16,8 +16,10 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Editor
-.vscode/
+# Editor (allow project settings, ignore personal files)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 
 # Deno
