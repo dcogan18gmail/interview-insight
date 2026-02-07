@@ -76,11 +76,12 @@ Plans:
 3. App handles localStorage quota exceeded with clear error message (not silent failure)
 4. App handles corrupted localStorage data without crashing (fallback to defaults)
 5. Project metadata and transcript data use separate localStorage keys for lazy loading
-   **Plans**: TBD
+   **Plans**: 2 plans
 
 Plans:
 
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Storage types + core primitives (safeRead, safeWrite, schema versioning, migration infrastructure, validators)
+- [ ] 03-02-PLAN.md — Project/transcript CRUD, debounced writes, beforeunload flush, orphan cleanup
 
 ### Phase 4: Core Architecture Refactor
 
@@ -201,7 +202,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | ------------------------------------ | -------------- | ----------- | ---------- |
 | 1. Security Hardening                | 3/3            | Complete    | 2026-02-07 |
 | 2. Development Tooling               | 2/2            | Complete    | 2026-02-07 |
-| 3. Storage Foundation                | 0/TBD          | Not started | -          |
+| 3. Storage Foundation                | 0/2            | Not started | -          |
 | 4. Core Architecture Refactor        | 0/TBD          | Not started | -          |
 | 5. Multi-Project Dashboard           | 0/TBD          | Not started | -          |
 | 6. Enhanced Transcription Experience | 0/TBD          | Not started | -          |
