@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FileUpload from './components/FileUpload';
 import TranscriptView from './components/TranscriptView';
 import LoadingState from './components/LoadingState';
+import Settings from './components/Settings';
 import { FileData, TranscriptSegment, TranscriptionStatus } from './types';
 import { generateTranscript, uploadFile } from './services/geminiService';
+import { hasStoredKey } from './services/cryptoService';
 
 const App: React.FC = () => {
   const [status, setStatus] = useState<TranscriptionStatus>(TranscriptionStatus.IDLE);
@@ -12,6 +14,12 @@ const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [currentSegment, setCurrentSegment] = useState<TranscriptSegment | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
+
+  useEffect(() => {
+    setApiKeyConfigured(hasStoredKey());
+  }, []);
 
   const handleFileSelected = (data: FileData) => {
     setFileData(data);
@@ -23,6 +31,10 @@ const App: React.FC = () => {
 
   const handleStartTranscription = async () => {
     if (!fileData) return;
+    if (!apiKeyConfigured) {
+      setShowSettings(true);
+      return;
+    }
 
     setStatus(TranscriptionStatus.UPLOADING);
     setErrorMessage(null);
@@ -94,15 +106,27 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {status === TranscriptionStatus.COMPLETED && (
+          <div className="flex items-center space-x-3">
+            {status === TranscriptionStatus.COMPLETED && (
+              <button
+                onClick={handleReset}
+                className="text-sm text-slate-600 hover:text-indigo-600 font-medium transition-colors flex items-center"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                New Transcription
+              </button>
+            )}
             <button
-              onClick={handleReset}
-              className="text-sm text-slate-600 hover:text-indigo-600 font-medium transition-colors flex items-center"
+              onClick={() => setShowSettings(true)}
+              className="text-slate-500 hover:text-indigo-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
+              title="Settings"
             >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-              New Transcription
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </button>
-          )}
+          </div>
         </div>
       </header>
 
@@ -122,6 +146,20 @@ const App: React.FC = () => {
 
         {/* Main Content Area */}
         <div className="flex flex-col items-center">
+
+          {/* API Key Required Prompt */}
+          {status === TranscriptionStatus.IDLE && !apiKeyConfigured && (
+            <div className="w-full max-w-2xl mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6 text-center animate-fade-in">
+              <h3 className="text-lg font-semibold text-amber-900 mb-2">API Key Required</h3>
+              <p className="text-amber-700 mb-4">To get started, you'll need to add your Gemini API key.</p>
+              <button
+                onClick={() => setShowSettings(true)}
+                className="px-6 py-2.5 bg-indigo-600 rounded-lg text-white font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+              >
+                Open Settings
+              </button>
+            </div>
+          )}
 
           {/* File Upload Stage */}
           {status === TranscriptionStatus.IDLE && (
@@ -190,6 +228,13 @@ const App: React.FC = () => {
 
         </div>
       </main>
+
+      {showSettings && (
+        <Settings
+          onClose={() => setShowSettings(false)}
+          onKeyChanged={() => setApiKeyConfigured(hasStoredKey())}
+        />
+      )}
     </div>
   );
 };

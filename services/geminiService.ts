@@ -1,17 +1,17 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { TranscriptSegment } from "../types";
+import { getDecryptedKey } from "./cryptoService";
 
-// Lazy init to prevent crash on load if env var is missing
-let ai: GoogleGenAI | null = null;
-const getAI = () => {
-  if (!ai) {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      throw new Error("API Key is missing. Please check your environment configuration.");
-    }
-    ai = new GoogleGenAI({ apiKey });
+/**
+ * Create a GoogleGenAI client using the decrypted API key from localStorage.
+ * Returns a fresh instance each time (key may change between calls).
+ */
+const createAI = async (): Promise<GoogleGenAI> => {
+  const apiKey = await getDecryptedKey();
+  if (!apiKey) {
+    throw new Error("No API key configured. Please add your Gemini API key in Settings.");
   }
-  return ai;
+  return new GoogleGenAI({ apiKey });
 };
 
 const MODEL_NAME = 'gemini-3-pro-preview';
@@ -67,9 +67,19 @@ const isDuplicate = (newSegment: TranscriptSegment, existingSegments: Transcript
 
 export const uploadFile = async (file: File, onUploadProgress: (progress: number) => void): Promise<string> => {
   try {
-    // 1. Get Upload URL from Netlify Function
-    const response = await fetch('/.netlify/functions/gemini-upload', {
+    // Decrypt user's API key for BYOK
+    const apiKey = await getDecryptedKey();
+    if (!apiKey) {
+      throw new Error("No API key configured. Please add your Gemini API key in Settings.");
+    }
+
+    // 1. Get Upload URL from Netlify Function (v2 path, BYOK header)
+    const response = await fetch('/api/gemini-upload', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Gemini-Key': apiKey,
+      },
       body: JSON.stringify({
         name: file.name,
         size: file.size,
@@ -150,6 +160,9 @@ export const generateTranscript = async (
   const MAX_LOOPS = 40;
 
   try {
+    // Create AI client once before the loop (BYOK: decrypts key from localStorage)
+    const aiClient = await createAI();
+
     while (!isComplete && loopCount < MAX_LOOPS) {
       loopCount++;
 
@@ -205,7 +218,6 @@ export const generateTranscript = async (
       console.log(`[GeminiService] Loop ${loopCount}: Starting from approx ${currentStartTime}s`);
 
       try {
-        const aiClient = getAI();
         const stream = await aiClient.models.generateContentStream({
           model: MODEL_NAME,
           contents: {
