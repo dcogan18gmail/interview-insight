@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 4 - Core Architecture Refactor (In progress)
+**Current focus:** Phase 4 - Core Architecture Refactor (Complete)
 
 ## Current Position
 
 Phase: 4 of 9 (Core Architecture Refactor)
-Plan: 2 of 3
-Status: In progress
-Last activity: 2026-02-08 -- Completed 04-02-PLAN.md (Service Extraction, State Machine Hook, and Bug Fixes)
+Plan: 3 of 3
+Status: Phase complete
+Last activity: 2026-02-08 -- Completed 04-03-PLAN.md (Router-Based Page Decomposition)
 
-Progress: [█████████░] ~30% (9 plans of ~30+ estimated total)
+Progress: [██████████░░░░░░░░░░] ~33% (10 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9
-- Average duration: ~3m 22s
-- Total execution time: ~0.50 hours
+- Total plans completed: 10
+- Average duration: ~3m 23s
+- Total execution time: ~0.56 hours
 
 **By Phase:**
 
@@ -31,12 +31,12 @@ Progress: [█████████░] ~30% (9 plans of ~30+ estimated total
 | 01-security-hardening         | 3/3   | ~5m 29s  | ~1m 50s  |
 | 02-development-tooling        | 2/2   | ~7m 43s  | ~3m 52s  |
 | 03-storage-foundation         | 2/2   | ~6m 10s  | ~3m 05s  |
-| 04-core-architecture-refactor | 2/3   | ~11m 35s | ~5m 48s  |
+| 04-core-architecture-refactor | 3/3   | ~14m 59s | ~5m 00s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 03-01 (2m 50s), 03-02 (3m 20s), 04-01 (8m 20s), 04-02 (3m 15s)
-- Trend: 04-02 back to normal pace; service extraction and bug fixes straightforward
+- Last 5 plans: 03-02 (3m 20s), 04-01 (8m 20s), 04-02 (3m 15s), 04-03 (3m 24s)
+- Trend: Phase 4 complete; routing decomposition was clean with no deviations
 
 _Updated after each plan completion_
 
@@ -86,6 +86,10 @@ Recent decisions affecting current work:
 - useTranscription hook uses TRANSITIONS map for valid state machine transitions (04-02)
 - Download All uses 100ms delay between sequential saves for browser compatibility (04-02)
 - durationUnknown flag set via spread conditional to avoid always-present field (04-02)
+- ApiKeyForm uses useSettings dispatch directly instead of prop callbacks (04-03)
+- ProjectPage maps hook TranscriptionState to TranscriptionStatus enum for LoadingState compat (04-03)
+- SettingsProvider > ProjectsProvider > BrowserRouter nesting order in App.tsx (04-03)
+- DashboardPage is Phase 5 placeholder with functional project list (04-03)
 
 ### Pending Todos
 
@@ -108,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08T00:33:43Z
-Stopped at: Completed 04-02-PLAN.md (Service Extraction, State Machine Hook, and Bug Fixes)
+Last session: 2026-02-08T00:37:17Z
+Stopped at: Completed 04-03-PLAN.md (Router-Based Page Decomposition) -- Phase 4 complete
 Resume file: None
