@@ -81,7 +81,9 @@ export default function ProjectPage() {
     const { project, ok } = createProject(fileData.name, fileInfo);
     if (ok) {
       setCreatedProjectId(project.id);
-      navigate(`/project/${project.id}`, { replace: true });
+      // Don't navigate yet — stay on /project/new so CenterPanel keeps rendering
+      // ProjectPage (with ProgressStepper + LiveTranscriptView).
+      // Navigate to the real project URL on completion/error/cancel.
     }
 
     startTranscription(
@@ -117,13 +119,17 @@ export default function ProjectPage() {
         completedAt: new Date().toISOString(),
       });
       updateProject({ ...project, status: 'completed' });
+      // Navigate to the real project URL now that transcription is done
+      navigate(`/project/${targetId}`, { replace: true });
     } else if (machineState.state === 'error' && project.status !== 'error') {
       updateProject({ ...project, status: 'error' });
+      navigate(`/project/${targetId}`, { replace: true });
     } else if (
       machineState.state === 'cancelled' &&
       project.status !== 'cancelled'
     ) {
       updateProject({ ...project, status: 'cancelled' });
+      navigate(`/project/${targetId}`, { replace: true });
     }
   }, [
     machineState.state,
@@ -131,6 +137,7 @@ export default function ProjectPage() {
     projectsState.projects,
     updateProject,
     machineState.transcript,
+    navigate,
   ]);
 
   // Map hook state names to the TranscriptionStatus enum
