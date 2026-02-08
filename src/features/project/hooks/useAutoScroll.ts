@@ -2,14 +2,14 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 interface UseAutoScrollReturn {
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
   sentinelRef: (node?: Element | null) => void;
   isAtBottom: boolean;
   scrollToBottom: () => void;
 }
 
 export function useAutoScroll(deps: unknown[] = []): UseAutoScrollReturn {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null!);
 
   // IntersectionObserver on sentinel div at bottom of scroll content
   const { ref: sentinelRef, inView: isAtBottom } = useInView({
