@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 5 of 9 (Multi-Project Dashboard)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-08 -- Completed 05-01-PLAN.md (Schema Extension and 3-Panel Layout)
+Last activity: 2026-02-08 -- Completed 05-02-PLAN.md (Sidebar CRUD and Project Creation)
 
-Progress: [███████████░░░░░░░░░] ~37% (11 plans of ~30+ estimated total)
+Progress: [████████████░░░░░░░░] ~40% (12 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11
-- Average duration: ~3m 20s
-- Total execution time: ~0.61 hours
+- Total plans completed: 12
+- Average duration: ~3m 17s
+- Total execution time: ~0.66 hours
 
 **By Phase:**
 
@@ -32,12 +32,12 @@ Progress: [███████████░░░░░░░░░] ~37% (1
 | 02-development-tooling        | 2/2   | ~7m 43s  | ~3m 52s  |
 | 03-storage-foundation         | 2/2   | ~6m 10s  | ~3m 05s  |
 | 04-core-architecture-refactor | 3/3   | ~14m 59s | ~5m 00s  |
-| 05-multi-project-dashboard    | 1/3   | ~3m 00s  | ~3m 00s  |
+| 05-multi-project-dashboard    | 2/3   | ~6m 00s  | ~3m 00s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-01 (8m 20s), 04-02 (3m 15s), 04-03 (3m 24s), 05-01 (3m 00s)
-- Trend: Phase 5 started; schema + layout foundation completed cleanly with 1 minor deviation
+- Last 5 plans: 04-02 (3m 15s), 04-03 (3m 24s), 05-01 (3m 00s), 05-02 (3m 00s)
+- Trend: Phase 5 progressing; CRUD operations complete, one plan remaining (metadata editing)
 
 _Updated after each plan completion_
 
@@ -95,6 +95,11 @@ Recent decisions affecting current work:
 - DashboardLayout as nested route element wrapping dashboard routes; settings outside (05-01)
 - Sidebar primary label: interviewee name falling back to project name (05-01)
 - DashboardPage.tsx deleted, replaced by DashboardLayout + CenterPanel (05-01)
+- ConfirmDialog uses native dialog showModal() for focus trap, backdrop, and Escape handling (05-02)
+- Inline rename always updates project.name regardless of whether interviewee was displayed (05-02)
+- Project created in storage immediately on upload start, not on transcription completion (05-02)
+- createdProjectId local state tracks new project through lifecycle to prevent infinite update loops (05-02)
+- saveTranscript called directly from storageService since context only manages metadata (05-02)
 
 ### Pending Todos
 
@@ -117,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08T03:11:43Z
-Stopped at: Completed 05-01-PLAN.md (Schema Extension and 3-Panel Layout) -- Phase 5 plan 1 of 3
-Resume file: .planning/phases/05-multi-project-dashboard/05-02-PLAN.md
+Last session: 2026-02-08T03:18:23Z
+Stopped at: Completed 05-02-PLAN.md (Sidebar CRUD and Project Creation) -- Phase 5 plan 2 of 3
+Resume file: .planning/phases/05-multi-project-dashboard/05-03-PLAN.md
