@@ -10,33 +10,33 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 4 of 9 (Core Architecture Refactor)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-08 -- Completed 04-01-PLAN.md (Src Directory Migration and Context Providers)
+Last activity: 2026-02-08 -- Completed 04-02-PLAN.md (Service Extraction, State Machine Hook, and Bug Fixes)
 
-Progress: [████████░░] ~27% (8 plans of ~30+ estimated total)
+Progress: [█████████░] ~30% (9 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
-- Average duration: ~3m 23s
-- Total execution time: ~0.45 hours
+- Total plans completed: 9
+- Average duration: ~3m 22s
+- Total execution time: ~0.50 hours
 
 **By Phase:**
 
-| Phase                         | Plans | Total   | Avg/Plan |
-| ----------------------------- | ----- | ------- | -------- |
-| 01-security-hardening         | 3/3   | ~5m 29s | ~1m 50s  |
-| 02-development-tooling        | 2/2   | ~7m 43s | ~3m 52s  |
-| 03-storage-foundation         | 2/2   | ~6m 10s | ~3m 05s  |
-| 04-core-architecture-refactor | 1/3   | ~8m 20s | ~8m 20s  |
+| Phase                         | Plans | Total    | Avg/Plan |
+| ----------------------------- | ----- | -------- | -------- |
+| 01-security-hardening         | 3/3   | ~5m 29s  | ~1m 50s  |
+| 02-development-tooling        | 2/2   | ~7m 43s  | ~3m 52s  |
+| 03-storage-foundation         | 2/2   | ~6m 10s  | ~3m 05s  |
+| 04-core-architecture-refactor | 2/3   | ~11m 35s | ~5m 48s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 02-02 (3m 25s), 03-01 (2m 50s), 03-02 (3m 20s), 04-01 (8m 20s)
-- Trend: 04-01 longer due to large file migration (18 files moved + restructured)
+- Last 5 plans: 03-01 (2m 50s), 03-02 (3m 20s), 04-01 (8m 20s), 04-02 (3m 15s)
+- Trend: 04-02 back to normal pace; service extraction and bug fixes straightforward
 
 _Updated after each plan completion_
 
@@ -82,6 +82,10 @@ Recent decisions affecting current work:
 - SettingsProvider wraps ProjectsProvider (outer > inner) for future dependency direction (04-01)
 - Existing App.tsx useState hooks preserved alongside new contexts for zero-regression migration (04-01)
 - react-router 7.13.0 and vite-tsconfig-paths 6.1.0 pinned to exact versions (04-01)
+- geminiService accepts apiKey as first parameter, caller responsible for key retrieval (04-02)
+- useTranscription hook uses TRANSITIONS map for valid state machine transitions (04-02)
+- Download All uses 100ms delay between sequential saves for browser compatibility (04-02)
+- durationUnknown flag set via spread conditional to avoid always-present field (04-02)
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08T00:27:23Z
-Stopped at: Completed 04-01-PLAN.md (Src Directory Migration and Context Providers)
+Last session: 2026-02-08T00:33:43Z
+Stopped at: Completed 04-02-PLAN.md (Service Extraction, State Machine Hook, and Bug Fixes)
 Resume file: None
