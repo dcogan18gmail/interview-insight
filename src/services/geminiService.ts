@@ -64,7 +64,8 @@ const isDuplicate = (
 export const uploadFile = async (
   apiKey: string,
   file: File,
-  onUploadProgress: (progress: number) => void
+  onUploadProgress: (progress: number) => void,
+  signal?: AbortSignal
 ): Promise<string> => {
   try {
     // 1. Get Upload URL from Netlify Function (v2 path, BYOK header)
@@ -79,6 +80,7 @@ export const uploadFile = async (
         size: file.size,
         mimeType: file.type,
       }),
+      signal,
     });
 
     if (!response.ok) {
@@ -96,6 +98,10 @@ export const uploadFile = async (
     let offset = 0;
 
     while (offset < totalBytes) {
+      if (signal?.aborted) {
+        throw new DOMException('Upload cancelled', 'AbortError');
+      }
+
       const chunk = file.slice(offset, offset + CHUNK_SIZE);
       const isLastChunk = offset + chunk.size >= totalBytes;
       const command = isLastChunk ? 'upload, finalize' : 'upload';
@@ -113,6 +119,7 @@ export const uploadFile = async (
           'Content-Type': 'application/octet-stream',
         },
         body: arrayBuffer,
+        signal,
       });
 
       if (!proxyResponse.ok) {
@@ -145,7 +152,8 @@ export const generateTranscript = async (
   onProgress: (
     percentage: number,
     currentSegment: TranscriptSegment | null
-  ) => void
+  ) => void,
+  signal?: AbortSignal
 ): Promise<TranscriptSegment[]> => {
   const allSegments: TranscriptSegment[] = [];
   let currentStartTime = 0;
@@ -154,12 +162,18 @@ export const generateTranscript = async (
   const MAX_RETRIES = 3;
   let loopCount = 0;
   const MAX_LOOPS = 40;
+  let maxProgress = 0;
 
   try {
     // Create AI client once before the loop
     const aiClient = new GoogleGenAI({ apiKey });
 
     while (!isComplete && loopCount < MAX_LOOPS) {
+      // Check abort before each loop iteration
+      if (signal?.aborted) {
+        throw new DOMException('Transcription cancelled', 'AbortError');
+      }
+
       loopCount++;
 
       // HARD EXIT: If we are effectively at the end of the file, stop.
@@ -226,6 +240,7 @@ export const generateTranscript = async (
           config: {
             maxOutputTokens: 65536,
             temperature: 0.3, // Slight increase to avoid "stuck" repetitive states
+            abortSignal: signal,
           },
         });
 
@@ -234,6 +249,10 @@ export const generateTranscript = async (
         let lastSegmentInChunk: TranscriptSegment | null = null;
 
         for await (const chunk of stream) {
+          if (signal?.aborted) {
+            throw new DOMException('Transcription cancelled', 'AbortError');
+          }
+
           const chunkText = (chunk as GenerateContentResponse).text || '';
           buffer += chunkText;
 
@@ -258,8 +277,8 @@ export const generateTranscript = async (
             lastSegmentInChunk = segment;
             segmentsInThisChunk++;
 
-            // Progress Update
-            const percentage =
+            // Progress Update (monotonic: never decreases)
+            const calculatedPercentage =
               durationSeconds > 0
                 ? Math.min(
                     Math.round(
@@ -268,6 +287,8 @@ export const generateTranscript = async (
                     99
                   )
                 : 99;
+            const percentage = Math.max(maxProgress, calculatedPercentage);
+            maxProgress = percentage;
             onProgress(percentage, segment);
           }
         }
@@ -338,6 +359,14 @@ export const generateTranscript = async (
           currentStartTime = lastTimestamp;
         }
       } catch (innerError) {
+        // Propagate cancellation immediately, never retry AbortError
+        if (
+          innerError instanceof DOMException &&
+          innerError.name === 'AbortError'
+        ) {
+          throw innerError;
+        }
+
         console.error('Error in chunk generation:', innerError);
         retryCount++;
         if (retryCount > MAX_RETRIES) throw innerError;
