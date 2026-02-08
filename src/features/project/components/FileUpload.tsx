@@ -51,33 +51,51 @@ const FileUpload: React.FC<FileUploadProps> = ({
       // Create a temporary video element to extract duration
       const media = document.createElement('video');
       media.preload = 'metadata';
+
+      // BUG-01 fix: Store ObjectURL so we can revoke it after metadata extraction
+      const objectUrl = URL.createObjectURL(file);
+
+      const cleanup = () => {
+        URL.revokeObjectURL(objectUrl);
+        media.remove();
+      };
+
       media.onloadedmetadata = () => {
         const duration = media.duration;
-        media.remove();
+        const validDuration = duration && isFinite(duration) && duration > 0;
+
+        cleanup();
 
         onFileSelected({
           name: file.name,
           type: file.type,
           size: file.size,
-          file: file, // Pass the File object
-          duration: duration && isFinite(duration) ? duration : 0,
+          file: file,
+          duration: validDuration ? duration : 0,
+          // BUG-03 fix: Flag when duration could not be determined
+          ...(validDuration ? {} : { durationUnknown: true }),
         });
         setLoading(false);
       };
 
       media.onerror = () => {
         console.warn('Could not extract duration');
+
+        cleanup();
+
         onFileSelected({
           name: file.name,
           type: file.type,
           size: file.size,
-          file: file, // Pass the File object
+          file: file,
           duration: 0,
+          // BUG-03 fix: Always flag unknown duration on error
+          durationUnknown: true,
         });
         setLoading(false);
       };
 
-      media.src = URL.createObjectURL(file); // Use ObjectURL instead of reading entire file
+      media.src = objectUrl;
     },
     [onFileSelected]
   );
