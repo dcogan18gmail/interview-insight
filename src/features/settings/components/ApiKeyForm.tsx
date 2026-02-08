@@ -7,9 +7,12 @@ import {
   clearStoredKey,
 } from '@/services/cryptoService';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useTranscriptionState } from '@/contexts/TranscriptionContext';
 
 export default function ApiKeyForm() {
   const { dispatch } = useSettings();
+  const transcriptionState = useTranscriptionState();
+  const isTranscriptionActive = transcriptionState.isTranscribing;
   const [apiKey, setApiKey] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,10 +92,22 @@ export default function ApiKeyForm() {
           </span>
           <button
             onClick={handleClearKey}
-            className="text-sm font-medium text-red-600 hover:text-red-700"
+            disabled={isTranscriptionActive}
+            className="text-sm font-medium text-red-600 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Clear Key
           </button>
+        </div>
+      )}
+
+      {/* Active transcription warning */}
+      {isTranscriptionActive && (
+        <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3">
+          <p className="text-sm text-amber-800">
+            <span className="font-medium">Warning:</span> A transcription is
+            currently in progress. Changing or removing your API key will cause
+            it to fail.
+          </p>
         </div>
       )}
 
