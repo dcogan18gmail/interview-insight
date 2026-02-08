@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import type { ProjectMetadata } from '@/services/storageService.types';
 import type { TranscriptSegment } from '@/types';
 import { getTranscript } from '@/services/storageService';
@@ -9,6 +10,7 @@ interface TranscriptPanelProps {
 }
 
 export default function TranscriptPanel({ project }: TranscriptPanelProps) {
+  const navigate = useNavigate();
   const [segments, setSegments] = useState<TranscriptSegment[] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -117,6 +119,43 @@ export default function TranscriptPanel({ project }: TranscriptPanelProps) {
           If the problem persists, check your API key in Settings or try a
           smaller file.
         </p>
+      </div>
+    );
+  }
+
+  // --- Cancelled: show recovery card with partial transcript ---
+  if (project.status === 'cancelled') {
+    return (
+      <div className="p-6">
+        {/* Inline recovery card */}
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h3 className="text-sm font-semibold text-amber-900">
+            Transcription was interrupted
+          </h3>
+          <p className="mt-1 text-sm text-amber-700">
+            {project.segmentCount > 0
+              ? `${project.segmentCount} segment${project.segmentCount !== 1 ? 's' : ''} recovered.`
+              : 'No segments were saved.'}
+          </p>
+          <div className="mt-3 flex gap-3">
+            <button
+              onClick={() => navigate('/project/new')}
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+            >
+              Re-upload & Transcribe
+            </button>
+          </div>
+        </div>
+
+        {/* Show partial transcript if available */}
+        {segments && segments.length > 0 && (
+          <div className="opacity-70">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+              Partial Transcript
+            </p>
+            <TranscriptView transcript={segments} />
+          </div>
+        )}
       </div>
     );
   }

@@ -120,6 +120,10 @@ export default function ProjectEntry({
     setConfirmDelete(false);
   };
 
+  // --- Incomplete indicator ---
+  const isIncomplete =
+    project.status === 'cancelled' || project.status === 'error';
+
   // --- Navigation ---
 
   const handleClick = () => {
@@ -161,14 +165,26 @@ export default function ProjectEntry({
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <div
-              className="truncate text-sm font-medium"
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                startEditing();
-              }}
-            >
-              {getProjectLabel(project)}
+            <div className="flex items-center">
+              <div
+                className="truncate text-sm font-medium"
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  startEditing();
+                }}
+              >
+                {getProjectLabel(project)}
+              </div>
+              {isIncomplete && (
+                <span
+                  className="ml-1.5 inline-block h-2 w-2 flex-shrink-0 rounded-full bg-amber-400"
+                  title={
+                    project.status === 'cancelled'
+                      ? 'Transcription incomplete'
+                      : 'Transcription failed'
+                  }
+                />
+              )}
             </div>
           )}
         </div>
