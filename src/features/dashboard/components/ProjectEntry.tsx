@@ -128,6 +128,13 @@ export default function ProjectEntry({
 
   const handleClick = () => {
     if (!editing) {
+      // If the project is actively transcribing (uploading/processing) and we're
+      // currently on /project/new, stay there to avoid unmounting the transcription hook.
+      const isActivelyTranscribing =
+        project.status === 'uploading' || project.status === 'processing';
+      if (isActivelyTranscribing && projectId === 'new') {
+        return; // No-op: transcription is in progress on /project/new
+      }
       navigate(`/project/${project.id}`);
     }
   };

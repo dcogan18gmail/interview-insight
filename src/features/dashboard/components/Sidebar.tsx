@@ -78,20 +78,40 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto">
         {collapsed ? (
           <div className="flex flex-col items-center gap-1 pt-2">
-            {sortedProjects.map((project) => (
-              <NavLink
-                key={project.id}
-                to={`/project/${project.id}`}
-                className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
-                  projectId === project.id
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'text-slate-500 hover:bg-slate-200 hover:text-slate-700'
-                }`}
-                title={getProjectLabel(project)}
-              >
-                {getProjectLabel(project).charAt(0).toUpperCase()}
-              </NavLink>
-            ))}
+            {sortedProjects.map((project) => {
+              const isActivelyTranscribing =
+                project.status === 'uploading' ||
+                project.status === 'processing';
+              const target =
+                isActivelyTranscribing && projectId === 'new'
+                  ? '/project/new'
+                  : `/project/${project.id}`;
+              return (
+                <NavLink
+                  key={project.id}
+                  to={target}
+                  onClick={(e) => {
+                    if (isActivelyTranscribing && projectId === 'new') {
+                      e.preventDefault();
+                    }
+                  }}
+                  className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
+                    projectId === project.id
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                  }`}
+                  title={getProjectLabel(project)}
+                >
+                  {project.interviewee
+                    ? project.interviewee
+                        .split(/\s+/)
+                        .slice(0, 2)
+                        .map((w) => w.charAt(0).toUpperCase())
+                        .join('')
+                    : '?'}
+                </NavLink>
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col gap-0.5 p-2">

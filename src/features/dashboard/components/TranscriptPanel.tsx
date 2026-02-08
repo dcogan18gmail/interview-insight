@@ -153,7 +153,7 @@ export default function TranscriptPanel({ project }: TranscriptPanelProps) {
             <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
               Partial Transcript
             </p>
-            <TranscriptView transcript={segments} />
+            <TranscriptView transcript={segments} projectName={project.name} />
           </div>
         )}
       </div>
@@ -184,7 +184,7 @@ export default function TranscriptPanel({ project }: TranscriptPanelProps) {
 
   return (
     <div className="p-6">
-      <TranscriptView transcript={segments} />
+      <TranscriptView transcript={segments} projectName={project.name} />
     </div>
   );
 }

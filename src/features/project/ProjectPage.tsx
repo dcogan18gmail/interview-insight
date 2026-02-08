@@ -56,6 +56,12 @@ export default function ProjectPage() {
       ? (projectsState.projects.find((p) => p.id === projectId) ?? null)
       : null;
 
+  // Derive project name for downloads (from created or existing project)
+  const activeProjectName =
+    (createdProjectId
+      ? projectsState.projects.find((p) => p.id === createdProjectId)?.name
+      : existingProject?.name) ?? undefined;
+
   // Redirect if existing project not found (after initialization)
   useEffect(() => {
     if (!isNew && projectId && projectsState.initialized && !existingProject) {
@@ -113,12 +119,30 @@ export default function ProjectPage() {
       machineState.state === 'completed' &&
       project.status !== 'completed'
     ) {
+      const segments = machineState.transcript;
       saveTranscript({
         projectId: targetId,
-        segments: machineState.transcript,
+        segments,
         completedAt: new Date().toISOString(),
       });
-      updateProject({ ...project, status: 'completed' });
+
+      // Reconcile metadata: include correct segmentCount and update duration
+      // if transcript timestamps exceed browser-detected duration.
+      const maxTimestamp =
+        segments.length > 0
+          ? Math.max(...segments.map((s) => s.timestamp ?? 0))
+          : 0;
+      const reconciledDuration =
+        maxTimestamp > project.fileInfo.duration
+          ? maxTimestamp
+          : project.fileInfo.duration;
+
+      updateProject({
+        ...project,
+        status: 'completed',
+        segmentCount: segments.length,
+        fileInfo: { ...project.fileInfo, duration: reconciledDuration },
+      });
       // Navigate to the real project URL now that transcription is done
       navigate(`/project/${targetId}`, { replace: true });
     } else if (machineState.state === 'error' && project.status !== 'error') {
@@ -128,7 +152,11 @@ export default function ProjectPage() {
       machineState.state === 'cancelled' &&
       project.status !== 'cancelled'
     ) {
-      updateProject({ ...project, status: 'cancelled' });
+      updateProject({
+        ...project,
+        status: 'cancelled',
+        segmentCount: machineState.transcript.length,
+      });
       navigate(`/project/${targetId}`, { replace: true });
     }
   }, [
@@ -303,7 +331,10 @@ export default function ProjectPage() {
 
           {/* Show partial transcript */}
           {machineState.transcript.length > 0 && (
-            <TranscriptView transcript={machineState.transcript} />
+            <TranscriptView
+              transcript={machineState.transcript}
+              projectName={activeProjectName}
+            />
           )}
         </div>
       )}
@@ -332,7 +363,10 @@ export default function ProjectPage() {
               New Transcription
             </button>
           </div>
-          <TranscriptView transcript={machineState.transcript} />
+          <TranscriptView
+            transcript={machineState.transcript}
+            projectName={activeProjectName}
+          />
         </div>
       )}
 

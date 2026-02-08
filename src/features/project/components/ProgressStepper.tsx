@@ -49,6 +49,9 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
 
   const currentIndex = STAGE_INDEX[currentStage];
 
+  // Show indeterminate animation when processing but no real progress yet
+  const isIndeterminate = currentStage === 'processing' && progress < 5;
+
   // Compute time estimate from progress and elapsed time
   const computedEstimate = useMemo(() => {
     const elapsed = Date.now() - startTimeRef.current;
@@ -121,18 +124,24 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
 
       {/* Progress bar */}
       <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ease-out ${
-            completionFlash ? 'bg-green-500' : 'bg-indigo-600'
-          }`}
-          style={{ width: `${Math.min(progress, 100)}%` }}
-        />
+        {isIndeterminate ? (
+          <div className="h-full w-1/3 animate-[indeterminate_1.5s_ease-in-out_infinite] rounded-full bg-indigo-400" />
+        ) : (
+          <div
+            className={`h-full rounded-full transition-all duration-500 ease-out ${
+              completionFlash ? 'bg-green-500' : 'bg-indigo-600'
+            }`}
+            style={{ width: `${Math.min(progress, 100)}%` }}
+          />
+        )}
       </div>
 
       {/* Time estimate + Cancel row */}
       <div className="mt-1.5 flex items-center justify-between">
         <span className="text-xs text-slate-500">
-          {displayEstimate ?? 'Estimating...'}
+          {isIndeterminate
+            ? 'Waiting for AI...'
+            : `${Math.round(progress)}% · ${displayEstimate ?? 'Estimating...'}`}
         </span>
         {onCancel && (
           <button

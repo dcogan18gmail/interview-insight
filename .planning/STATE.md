@@ -120,7 +120,9 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- **Human UAT pass (Phases 1-5)** -- Run `/gsd:verify-work` before Phase 8 (Testing Coverage). Each phase has a "Human Verification Required" section in its VERIFICATION.md with specific test scenarios. Phase 3 storage runtime tests (persistence, corruption recovery, quota, migration, debounced writes, orphan cleanup) were deferred pending app integration -- now fully integrated. Do this before writing automated tests so UAT findings can inform test coverage.
+- **Human UAT pass (Phases 1-6)** -- Golden-path UAT in progress. 6 passed, 13 pending (4 retests after fixes), 3 skipped. Resume file: `.planning/phases/00-golden-path/golden-path-UAT.md`
+- **Transcription accuracy pipeline** -- Current LLM-only approach produces nondeterministic timestamps/turns. Plan a phase to introduce dedicated ASR (Whisper or equivalent) for deterministic segmentation, with Gemini only for translation/analysis. See Blockers/Concerns for details. Consider inserting as Phase 7 or 7.1 before UI Polish.
+- **Progress tracker anchoring** -- ProgressStepper disappears between state transitions instead of staying visible. Needs investigation and fix.
 
 ### Blockers/Concerns
 
@@ -136,6 +138,13 @@ Recent decisions affecting current work:
 **Phase 6 (Transcription) -- PARTIALLY RESOLVED:**
 
 - ~~Gemini API resumability: Need to verify whether Gemini's Files API supports resuming partial transcriptions mid-stream.~~ Verified: AbortSignal is client-only, no server-side resume. File URIs persist 48h. Strategy: re-transcribe from scratch using persisted fileUri, skip re-upload.
+
+**Transcription Accuracy -- OPEN (architectural):**
+
+- Timestamps, conversational turns, and speaker segmentation are nondeterministic because Gemini handles all of it. The same file can produce different timestamps and turn boundaries on different runs. This is inherent to LLM-based transcription.
+- **Recommended approach:** Introduce a dedicated ASR pipeline stage (e.g., Whisper via API or local) that produces deterministic timestamps and speaker diarization. Then use Gemini only for translation, analysis, and enrichment on top of the structured ASR output. This separates "what was said and when" (ASR, deterministic) from "what does it mean" (LLM, creative).
+- **Scope:** This is a significant architectural change. Should be planned as its own phase (likely Phase 7 or inserted before UI Polish). Requires: evaluating ASR options (Whisper API, AssemblyAI, Deepgram), defining the pipeline interface, refactoring geminiService to accept pre-segmented input.
+- **Impact on current work:** Current transcription works end-to-end but results vary between runs. Acceptable for v1 launch. Accuracy improvements should be planned before any production/enterprise use.
 
 ## Session Continuity
 

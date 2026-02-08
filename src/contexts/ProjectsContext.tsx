@@ -108,7 +108,7 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateProject = useCallback((project: ProjectMetadata) => {
-    storageSaveProject(project);
+    storageSaveProject(project, true);
     dispatch({ type: 'PROJECT_UPDATED', project });
   }, []);
 

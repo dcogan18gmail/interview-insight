@@ -9,9 +9,25 @@ import {
 
 interface TranscriptViewProps {
   transcript: TranscriptSegment[];
+  projectName?: string;
 }
 
-const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
+/** Build a download filename: ProjectName_Variant_YYYY-MM-DD.docx */
+function buildFilename(
+  projectName: string | undefined,
+  variant: string
+): string {
+  const datePart = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const safeName = projectName
+    ? projectName.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40)
+    : 'transcript';
+  return `${safeName}_${variant}_${datePart}.docx`;
+}
+
+const TranscriptView: React.FC<TranscriptViewProps> = ({
+  transcript,
+  projectName,
+}) => {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   const handleDownload = async (
@@ -21,9 +37,15 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
 
     if (type === 'all') {
       const types: Array<{ variant: DocxVariant; filename: string }> = [
-        { variant: 'english', filename: 'transcript_english.docx' },
-        { variant: 'original', filename: 'transcript_original.docx' },
-        { variant: 'combined', filename: 'transcript_combined.docx' },
+        { variant: 'english', filename: buildFilename(projectName, 'english') },
+        {
+          variant: 'original',
+          filename: buildFilename(projectName, 'original'),
+        },
+        {
+          variant: 'combined',
+          filename: buildFilename(projectName, 'combined'),
+        },
       ];
       for (const { variant, filename } of types) {
         const blob = await generateDocxBlob(transcript, variant);
@@ -32,7 +54,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
       }
     } else {
       const blob = await generateDocxBlob(transcript, type);
-      saveBlob(blob, `transcript_${type}.docx`);
+      saveBlob(blob, buildFilename(projectName, type));
     }
   };
 
