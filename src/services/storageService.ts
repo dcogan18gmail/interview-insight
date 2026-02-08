@@ -244,6 +244,25 @@ export function validateProjectMetadataArray(
         error: `Item ${i}: segmentCount must be a number`,
       };
     }
+
+    // v2 fields: optional during migration, always present after
+    const stringOrNullFields = [
+      'interviewee',
+      'interviewer',
+      'participants',
+      'interviewDate',
+      'originalLanguage',
+      'location',
+    ] as const;
+    for (const field of stringOrNullFields) {
+      const val = obj[field];
+      if (val !== undefined && val !== null && typeof val !== 'string') {
+        return {
+          ok: false,
+          error: `Item ${i}: ${field} must be a string or null`,
+        };
+      }
+    }
   }
 
   return { ok: true, data: raw as ProjectMetadata[] };
@@ -286,11 +305,43 @@ export function validateTranscriptData(
 // --- Migration infrastructure ---
 
 /**
- * Migration definitions. Empty for schema version 1.
- * Add entries here when schema changes are needed:
- *   { version: 2, up: () => { ... migrate from v1 to v2 ... } }
+ * Migration definitions.
+ * Each entry migrates from version N-1 to version N.
  */
-const migrations: Migration[] = [];
+const migrations: Migration[] = [
+  {
+    version: 2,
+    up: () => {
+      const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+      if (!raw) return;
+
+      let projects: unknown[];
+      try {
+        projects = JSON.parse(raw) as unknown[];
+      } catch {
+        return; // Corrupted data handled elsewhere
+      }
+
+      if (!Array.isArray(projects)) return;
+
+      const migrated = projects.map((p) => {
+        if (typeof p !== 'object' || p === null) return p;
+        const obj = p as Record<string, unknown>;
+        return {
+          ...obj,
+          interviewee: obj['interviewee'] ?? null,
+          interviewer: obj['interviewer'] ?? null,
+          participants: obj['participants'] ?? null,
+          interviewDate: obj['interviewDate'] ?? null,
+          originalLanguage: obj['originalLanguage'] ?? null,
+          location: obj['location'] ?? null,
+        };
+      });
+
+      localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(migrated));
+    },
+  },
+];
 
 /**
  * Run all migrations between currentVersion and targetVersion.
@@ -533,6 +584,12 @@ export function createProject(
     status: 'idle',
     fileInfo,
     segmentCount: 0,
+    interviewee: null,
+    interviewer: null,
+    participants: null,
+    interviewDate: null,
+    originalLanguage: null,
+    location: null,
   };
 
   const result = saveProject(project, true);

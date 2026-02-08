@@ -5,7 +5,7 @@ import type { TranscriptSegment } from '@/types';
 
 // --- Schema versioning ---
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 export interface StorageMeta {
   schemaVersion: number;
@@ -44,6 +44,13 @@ export interface ProjectMetadata {
   status: ProjectStatus;
   fileInfo: FileInfo;
   segmentCount: number; // Summary stat to avoid loading full transcript
+  // Extended metadata fields (v2) -- user-editable, start blank
+  interviewee: string | null; // Interviewee/subject name
+  interviewer: string | null; // Interviewer name
+  participants: string | null; // Other participants (free text)
+  interviewDate: string | null; // Date of interview (ISO 8601 or user-entered string)
+  originalLanguage: string | null; // Original language of the interview
+  location: string | null; // Location where interview took place
 }
 
 // --- Transcript types ---
