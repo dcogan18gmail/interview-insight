@@ -2,6 +2,8 @@ export enum TranscriptionStatus {
   IDLE = 'IDLE',
   UPLOADING = 'UPLOADING', // Processing file locally
   PROCESSING = 'PROCESSING', // Sending to Gemini
+  CANCELLING = 'CANCELLING', // Cancellation in progress
+  CANCELLED = 'CANCELLED', // Transcription cancelled by user
   COMPLETED = 'COMPLETED',
   ERROR = 'ERROR',
 }

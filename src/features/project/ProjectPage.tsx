@@ -5,26 +5,50 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useProjects } from '@/contexts/ProjectsContext';
 import { saveTranscript } from '@/services/storageService';
 import FileUpload from '@/features/project/components/FileUpload';
-import LoadingState from '@/features/project/components/LoadingState';
+import ProgressStepper from '@/features/project/components/ProgressStepper';
+import LiveTranscriptView from '@/features/project/components/LiveTranscriptView';
 import TranscriptView from '@/features/project/components/TranscriptView';
+import ConfirmDialog from '@/features/dashboard/components/ConfirmDialog';
 import { FileData, TranscriptionStatus } from '@/types';
+
+// --- Progress mapping helpers ---
+
+function getProgressStage(
+  state: string,
+  progress: number
+): 'uploading' | 'processing' | 'transcribing' | 'complete' {
+  if (state === 'uploading') return 'uploading';
+  if (state === 'processing' && progress < 5) return 'processing';
+  if (state === 'processing') return 'transcribing';
+  if (state === 'completed') return 'complete';
+  return 'uploading';
+}
+
+function getUnifiedProgress(state: string, rawProgress: number): number {
+  if (state === 'uploading') return Math.round(rawProgress * 0.25); // 0-25%
+  if (state === 'processing') {
+    if (rawProgress < 1) return 27; // Processing/init = 25-30%
+    return 30 + Math.round(rawProgress * 0.65); // 30-95%
+  }
+  if (state === 'completed') return 100;
+  return 0;
+}
 
 export default function ProjectPage() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { state: settingsState } = useSettings();
-  const {
-    machineState,
-    startTranscription,
-    cancel: _cancel,
-    reset,
-  } = useTranscription();
+  const { machineState, startTranscription, cancel, reset } =
+    useTranscription();
   const { state: projectsState, createProject, updateProject } = useProjects();
 
   const isNew = projectId === 'new';
 
   // Track the created project ID for the new project flow
   const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+
+  // Cancel confirmation dialog state
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // --- Existing project loading ---
   const existingProject =
@@ -109,19 +133,18 @@ export default function ProjectPage() {
     machineState.transcript,
   ]);
 
-  // Map hook state names to the TranscriptionStatus enum used by LoadingState
-  // cancelling/cancelled map to PROCESSING/ERROR for display purposes
+  // Map hook state names to the TranscriptionStatus enum
   const statusMap: Record<string, TranscriptionStatus> = {
     idle: TranscriptionStatus.IDLE,
     uploading: TranscriptionStatus.UPLOADING,
     processing: TranscriptionStatus.PROCESSING,
-    cancelling: TranscriptionStatus.PROCESSING,
-    cancelled: TranscriptionStatus.IDLE,
+    cancelling: TranscriptionStatus.CANCELLING,
+    cancelled: TranscriptionStatus.CANCELLED,
     completed: TranscriptionStatus.COMPLETED,
     error: TranscriptionStatus.ERROR,
   };
 
-  const displayStatus =
+  const _displayStatus =
     statusMap[machineState.state] ?? TranscriptionStatus.IDLE;
 
   const handleReset = () => {
@@ -129,6 +152,14 @@ export default function ProjectPage() {
     setCreatedProjectId(null);
     navigate('/project/new', { replace: true });
   };
+
+  // --- Cancel confirmation handlers ---
+  const handleCancelClick = () => setShowCancelConfirm(true);
+  const handleConfirmCancel = () => {
+    setShowCancelConfirm(false);
+    cancel();
+  };
+  const handleCancelDismiss = () => setShowCancelConfirm(false);
 
   // --- Render for existing project (not a newly created one) ---
   if (!isNew && existingProject && !createdProjectId) {
@@ -173,14 +204,39 @@ export default function ProjectPage() {
         </div>
       )}
 
-      {/* Processing Stage */}
+      {/* Processing Stage: ProgressStepper + LiveTranscriptView */}
       {(machineState.state === 'uploading' ||
-        machineState.state === 'processing') && (
-        <LoadingState
-          progress={machineState.progress}
-          currentSegment={machineState.currentSegment}
-          status={displayStatus}
-        />
+        machineState.state === 'processing' ||
+        machineState.state === 'cancelling') && (
+        <div className="w-full">
+          {/* Progress stepper + bar (inline, scrolls away) */}
+          <ProgressStepper
+            currentStage={getProgressStage(
+              machineState.state,
+              machineState.progress
+            )}
+            progress={getUnifiedProgress(
+              machineState.state,
+              machineState.progress
+            )}
+            timeEstimate={null}
+            onCancel={
+              machineState.state !== 'cancelling'
+                ? handleCancelClick
+                : undefined
+            }
+            isComplete={false}
+          />
+
+          {/* Live transcript display */}
+          <div className="mt-4" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+            <LiveTranscriptView
+              segments={machineState.transcript}
+              staleSegments={machineState.staleSegments}
+              isStreaming={machineState.state !== 'cancelling'}
+            />
+          </div>
+        </div>
       )}
 
       {/* Error Stage */}
@@ -216,6 +272,35 @@ export default function ProjectPage() {
         </div>
       )}
 
+      {/* Cancelled Stage: partial transcript + recovery */}
+      {machineState.state === 'cancelled' && (
+        <div className="w-full">
+          {/* Inline recovery notification */}
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <h3 className="text-sm font-semibold text-amber-900">
+              Transcription Cancelled
+            </h3>
+            <p className="mt-1 text-sm text-amber-700">
+              {machineState.transcript.length} segment
+              {machineState.transcript.length !== 1 ? 's' : ''} saved.
+            </p>
+            <div className="mt-3 flex gap-3">
+              <button
+                onClick={handleReset}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+              >
+                Start Fresh
+              </button>
+            </div>
+          </div>
+
+          {/* Show partial transcript */}
+          {machineState.transcript.length > 0 && (
+            <TranscriptView transcript={machineState.transcript} />
+          )}
+        </div>
+      )}
+
       {/* Results Stage */}
       {machineState.state === 'completed' && (
         <div className="w-full">
@@ -243,6 +328,18 @@ export default function ProjectPage() {
           <TranscriptView transcript={machineState.transcript} />
         </div>
       )}
+
+      {/* Cancel confirmation dialog */}
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title="Cancel Transcription"
+        message="Cancel transcription? Partial results will be saved."
+        confirmLabel="Cancel Transcription"
+        cancelLabel="Keep Going"
+        variant="danger"
+        onConfirm={handleConfirmCancel}
+        onCancel={handleCancelDismiss}
+      />
     </div>
   );
 }
