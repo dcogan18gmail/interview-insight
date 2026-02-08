@@ -35,4 +35,33 @@
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
+
+  /* Fast fade-in for transcript segments (200ms) */
+  @keyframes fadeInFast {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in-fast {
+    animation: fadeInFast 0.2s ease-out forwards;
+  }
+
+  /* Subtle shimmer for in-progress segment */
+  @keyframes shimmer {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+  }
 }
