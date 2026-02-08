@@ -1,20 +1,5 @@
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { TranscriptSegment } from '@/types';
-import { getDecryptedKey } from '@/services/cryptoService';
-
-/**
- * Create a GoogleGenAI client using the decrypted API key from localStorage.
- * Returns a fresh instance each time (key may change between calls).
- */
-const createAI = async (): Promise<GoogleGenAI> => {
-  const apiKey = await getDecryptedKey();
-  if (!apiKey) {
-    throw new Error(
-      'No API key configured. Please add your Gemini API key in Settings.'
-    );
-  }
-  return new GoogleGenAI({ apiKey });
-};
 
 const MODEL_NAME = 'gemini-3-pro-preview';
 
@@ -77,18 +62,11 @@ const isDuplicate = (
 };
 
 export const uploadFile = async (
+  apiKey: string,
   file: File,
   onUploadProgress: (progress: number) => void
 ): Promise<string> => {
   try {
-    // Decrypt user's API key for BYOK
-    const apiKey = await getDecryptedKey();
-    if (!apiKey) {
-      throw new Error(
-        'No API key configured. Please add your Gemini API key in Settings.'
-      );
-    }
-
     // 1. Get Upload URL from Netlify Function (v2 path, BYOK header)
     const response = await fetch('/api/gemini-upload', {
       method: 'POST',
@@ -160,6 +138,7 @@ export const uploadFile = async (
 };
 
 export const generateTranscript = async (
+  apiKey: string,
   fileUri: string,
   mimeType: string,
   durationSeconds: number,
@@ -177,8 +156,8 @@ export const generateTranscript = async (
   const MAX_LOOPS = 40;
 
   try {
-    // Create AI client once before the loop (BYOK: decrypts key from localStorage)
-    const aiClient = await createAI();
+    // Create AI client once before the loop
+    const aiClient = new GoogleGenAI({ apiKey });
 
     while (!isComplete && loopCount < MAX_LOOPS) {
       loopCount++;

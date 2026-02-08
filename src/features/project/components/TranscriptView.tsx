@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { TranscriptSegment } from '@/types';
 import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-} from 'docx';
+  generateDocxBlob,
+  saveBlob,
+  formatTimestamp,
+  type DocxVariant,
+} from '@/services/docxExport';
 
 interface TranscriptViewProps {
   transcript: TranscriptSegment[];
@@ -16,114 +14,24 @@ interface TranscriptViewProps {
 const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
-  const formatTime = (seconds?: number) => {
-    if (seconds === undefined) return '00:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const generateDocxBlob = async (
-    type: 'english' | 'original' | 'combined'
-  ): Promise<Blob> => {
-    const children = [];
-
-    // Title
-    children.push(
-      new Paragraph({
-        text: `Interview Transcript - ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-      })
-    );
-
-    // Content
-    transcript.forEach((t) => {
-      const timestamp = formatTime(t.timestamp);
-
-      // Speaker + Timestamp Header
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `[${timestamp}] ${t.speaker}`,
-              bold: true,
-              size: 24, // 12pt
-            }),
-          ],
-          spacing: { before: 200, after: 50 },
-        })
-      );
-
-      // Text Body
-      if (type === 'english') {
-        children.push(new Paragraph({ text: t.englishText }));
-      } else if (type === 'original') {
-        children.push(new Paragraph({ text: t.originalText }));
-      } else if (type === 'combined') {
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: 'English: ', bold: true }),
-              new TextRun({ text: t.englishText }),
-            ],
-          })
-        );
-        // Only add original if different
-        if (t.originalText !== t.englishText) {
-          children.push(
-            new Paragraph({
-              children: [
-                new TextRun({ text: 'Original: ', bold: true, italics: true }),
-                new TextRun({ text: t.originalText, italics: true }),
-              ],
-              spacing: { after: 100 },
-            })
-          );
-        }
-      }
-    });
-
-    const doc = new Document({
-      sections: [
-        {
-          properties: {},
-          children: children,
-        },
-      ],
-    });
-
-    return await Packer.toBlob(doc);
-  };
-
-  const saveBlob = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const element = document.createElement('a');
-    element.href = url;
-    element.download = filename;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    URL.revokeObjectURL(url);
-  };
-
   const handleDownload = async (
     type: 'english' | 'original' | 'combined' | 'all'
   ) => {
     setShowDownloadMenu(false);
 
     if (type === 'all') {
-      const blobEng = await generateDocxBlob('english');
-      saveBlob(blobEng, 'transcript_english.docx');
-
-      const blobOrg = await generateDocxBlob('original');
-      setTimeout(() => saveBlob(blobOrg, 'transcript_original.docx'), 200);
-
-      const blobComb = await generateDocxBlob('combined');
-      setTimeout(() => saveBlob(blobComb, 'transcript_combined.docx'), 400);
+      const types: Array<{ variant: DocxVariant; filename: string }> = [
+        { variant: 'english', filename: 'transcript_english.docx' },
+        { variant: 'original', filename: 'transcript_original.docx' },
+        { variant: 'combined', filename: 'transcript_combined.docx' },
+      ];
+      for (const { variant, filename } of types) {
+        const blob = await generateDocxBlob(transcript, variant);
+        saveBlob(blob, filename);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
     } else {
-      const blob = await generateDocxBlob(type);
+      const blob = await generateDocxBlob(transcript, type);
       saveBlob(blob, `transcript_${type}.docx`);
     }
   };
@@ -135,8 +43,8 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
           t.originalText.trim().toLowerCase() !==
           t.englishText.trim().toLowerCase();
         return isTranslated
-          ? `[${formatTime(t.timestamp)}] ${t.speaker}:\n(Eng) ${t.englishText}\n(Org) ${t.originalText}`
-          : `[${formatTime(t.timestamp)}] ${t.speaker}: ${t.englishText}`;
+          ? `[${formatTimestamp(t.timestamp)}] ${t.speaker}:\n(Eng) ${t.englishText}\n(Org) ${t.originalText}`
+          : `[${formatTimestamp(t.timestamp)}] ${t.speaker}: ${t.englishText}`;
       })
       .join('\n\n');
 
@@ -280,7 +188,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({ transcript }) => {
               {/* Timestamp Column */}
               <div className="w-16 flex-shrink-0 pt-1.5">
                 <span className="rounded border border-gray-100 bg-gray-50 px-1.5 py-0.5 font-mono text-xs text-gray-400">
-                  {formatTime(segment.timestamp)}
+                  {formatTimestamp(segment.timestamp)}
                 </span>
               </div>
 

@@ -5,7 +5,7 @@ import LoadingState from '@/features/project/components/LoadingState';
 import Settings from '@/features/settings/components/Settings';
 import { FileData, TranscriptSegment, TranscriptionStatus } from '@/types';
 import { generateTranscript, uploadFile } from '@/services/geminiService';
-import { hasStoredKey } from '@/services/cryptoService';
+import { hasStoredKey, getDecryptedKey } from '@/services/cryptoService';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { ProjectsProvider } from '@/contexts/ProjectsContext';
 
@@ -46,11 +46,19 @@ const App: React.FC = () => {
     setProgress(0);
 
     try {
+      // Decrypt user's API key for BYOK
+      const apiKey = await getDecryptedKey();
+      if (!apiKey) {
+        throw new Error(
+          'No API key configured. Please add your Gemini API key in Settings.'
+        );
+      }
+
       // 1. Upload File if needed (if we have a File object)
       let fileUri = fileData.fileUri;
 
       if (!fileUri && fileData.file) {
-        fileUri = await uploadFile(fileData.file, (pct) => {
+        fileUri = await uploadFile(apiKey, fileData.file, (pct: number) => {
           setProgress(pct);
         });
       } else if (!fileUri && fileData.base64) {
@@ -70,10 +78,11 @@ const App: React.FC = () => {
 
       // 2. Generate Transcript
       const result = await generateTranscript(
+        apiKey,
         fileUri,
         fileData.type,
         fileData.duration,
-        (pct, segment) => {
+        (pct: number, segment: TranscriptSegment | null) => {
           setProgress(pct);
           if (segment) setCurrentSegment(segment);
         }
