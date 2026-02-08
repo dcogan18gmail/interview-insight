@@ -2,18 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router';
 import { useProjects } from '@/contexts/ProjectsContext';
 import type { ProjectMetadata } from '@/services/storageService.types';
-
-/** Format date as short form, e.g. "Jan 7" or "Dec 15, 2024" if not current year */
-function formatShortDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  const now = new Date();
-  const sameYear = date.getFullYear() === now.getFullYear();
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    ...(sameYear ? {} : { year: 'numeric' }),
-  });
-}
+import ProjectEntry from './ProjectEntry';
 
 /** Get display label for a project: interviewee name, falling back to project name */
 function getProjectLabel(project: ProjectMetadata): string {
@@ -107,32 +96,15 @@ export default function Sidebar() {
         ) : (
           <div className="flex flex-col gap-0.5 p-2">
             {sortedProjects.map((project) => (
-              <NavLink
+              <ProjectEntry
                 key={project.id}
-                to={`/project/${project.id}`}
-                className={`rounded-md px-3 py-2 transition-colors ${
-                  projectId === project.id
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <div className="truncate text-sm font-medium">
-                  {getProjectLabel(project)}
-                </div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
-                  <span>{formatShortDate(project.updatedAt)}</span>
-                  {project.originalLanguage && (
-                    <>
-                      <span className="text-slate-300">&middot;</span>
-                      <span>{project.originalLanguage}</span>
-                    </>
-                  )}
-                </div>
-              </NavLink>
+                project={project}
+                isSelected={project.id === projectId}
+              />
             ))}
             {sortedProjects.length === 0 && (
               <p className="px-3 py-4 text-center text-xs text-slate-400">
-                No projects yet
+                No projects yet. Click &quot;New Project&quot; to get started.
               </p>
             )}
           </div>
