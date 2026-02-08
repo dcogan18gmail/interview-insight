@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { Toaster } from 'sonner';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { ProjectsProvider } from '@/contexts/ProjectsContext';
+import { TranscriptionProvider } from '@/contexts/TranscriptionContext';
 import Layout from './Layout';
 import DashboardLayout from '@/features/dashboard/DashboardLayout';
 import CenterPanel from '@/features/dashboard/components/CenterPanel';
@@ -10,17 +12,20 @@ export default function App() {
   return (
     <SettingsProvider>
       <ProjectsProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route element={<DashboardLayout />}>
-                <Route index element={<CenterPanel />} />
-                <Route path="project/:projectId" element={<CenterPanel />} />
+        <TranscriptionProvider>
+          <BrowserRouter>
+            <Toaster position="bottom-right" richColors closeButton />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route element={<DashboardLayout />}>
+                  <Route index element={<CenterPanel />} />
+                  <Route path="project/:projectId" element={<CenterPanel />} />
+                </Route>
+                <Route path="settings" element={<SettingsPage />} />
               </Route>
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+          </BrowserRouter>
+        </TranscriptionProvider>
       </ProjectsProvider>
     </SettingsProvider>
   );
