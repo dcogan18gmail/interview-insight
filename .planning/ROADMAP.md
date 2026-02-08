@@ -145,6 +145,18 @@ Plans:
 - [x] 06-02-PLAN.md — ProgressStepper, LiveTranscriptView, useAutoScroll hook, CSS animations, react-intersection-observer
 - [x] 06-03-PLAN.md — Integration: rewire ProjectPage, cancel confirmation, recovery UI, sidebar indicator
 
+### Phase 06.1: Transcription State Architecture (INSERTED)
+
+**Goal:** Transcription state survives route navigation -- user can freely browse while transcription runs in background with full visibility
+**Depends on:** Phase 6
+**Plans:** 3 plans
+
+Plans:
+
+- [ ] 06.1-01-PLAN.md — TranscriptionContext provider + interrupted status + sonner install + App.tsx wiring
+- [ ] 06.1-02-PLAN.md — Rewire consumers (ProjectPage, CenterPanel, useTranscription) + TranscriptionWatcher toasts
+- [ ] 06.1-03-PLAN.md — Sidebar indicators (spinner/dots) + TranscriptPanel interrupted UI + Settings API key warning
+
 ### Phase 7: UI/UX Polish
 
 **Goal**: App feels production-ready with proper loading states, error handling, and accessibility
