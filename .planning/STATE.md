@@ -5,37 +5,38 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 3 - Storage Foundation (COMPLETE)
+**Current focus:** Phase 4 - Core Architecture Refactor (In progress)
 
 ## Current Position
 
-Phase: 3 of 9 (Storage Foundation)
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-02-07 -- Completed 03-02-PLAN.md (Project and Transcript CRUD with Debounced Writes)
+Phase: 4 of 9 (Core Architecture Refactor)
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-02-08 -- Completed 04-01-PLAN.md (Src Directory Migration and Context Providers)
 
-Progress: [███████░░░] ~23% (7 plans of ~30+ estimated total)
+Progress: [████████░░] ~27% (8 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7
-- Average duration: ~2m 48s
-- Total execution time: ~0.33 hours
+- Total plans completed: 8
+- Average duration: ~3m 23s
+- Total execution time: ~0.45 hours
 
 **By Phase:**
 
-| Phase                  | Plans | Total   | Avg/Plan |
-| ---------------------- | ----- | ------- | -------- |
-| 01-security-hardening  | 3/3   | ~5m 29s | ~1m 50s  |
-| 02-development-tooling | 2/2   | ~7m 43s | ~3m 52s  |
-| 03-storage-foundation  | 2/2   | ~6m 10s | ~3m 05s  |
+| Phase                         | Plans | Total   | Avg/Plan |
+| ----------------------------- | ----- | ------- | -------- |
+| 01-security-hardening         | 3/3   | ~5m 29s | ~1m 50s  |
+| 02-development-tooling        | 2/2   | ~7m 43s | ~3m 52s  |
+| 03-storage-foundation         | 2/2   | ~6m 10s | ~3m 05s  |
+| 04-core-architecture-refactor | 1/3   | ~8m 20s | ~8m 20s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 02-01 (4m 18s), 02-02 (3m 25s), 03-01 (2m 50s), 03-02 (3m 20s)
-- Trend: Consistent ~3min per plan for recent work
+- Last 5 plans: 02-02 (3m 25s), 03-01 (2m 50s), 03-02 (3m 20s), 04-01 (8m 20s)
+- Trend: 04-01 longer due to large file migration (18 files moved + restructured)
 
 _Updated after each plan completion_
 
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - saveTranscript syncs segmentCount back to project metadata (03-02)
 - beforeunload listener guarded with typeof window check for SSR safety (03-02)
 - cleanupOrphanedTranscripts iterates localStorage in reverse for safe removal during iteration (03-02)
+- SettingsProvider wraps ProjectsProvider (outer > inner) for future dependency direction (04-01)
+- Existing App.tsx useState hooks preserved alongside new contexts for zero-regression migration (04-01)
+- react-router 7.13.0 and vite-tsconfig-paths 6.1.0 pinned to exact versions (04-01)
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-07T23:34:09Z
-Stopped at: Completed 03-02-PLAN.md (Project and Transcript CRUD with Debounced Writes) -- Phase 3 complete
+Last session: 2026-02-08T00:27:23Z
+Stopped at: Completed 04-01-PLAN.md (Src Directory Migration and Context Providers)
 Resume file: None
