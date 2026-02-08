@@ -140,6 +140,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Golden-path UAT in progress (4 passed, 1 blocker, 15 pending). Two fixes applied mid-UAT: (1) route swap bug in ProjectPage.tsx committed as e782ace, (2) CSP fixes in netlify.toml edited but not committed. Need to verify upload works after CSP fix, then continue UAT from test 8.
+Stopped at: Golden-path UAT in progress (4 passed, 2 issues, 14 pending). Three fixes applied during UAT. Two bugs remain before UAT can continue: (1) BLOCKER sidebar click unmounts ProjectPage killing transcription hook, (2) MAJOR progress bar not showing visual progress. Vite dev proxy plugin added (uncommitted) to bypass Netlify CLI edge function crash.
 Resume file: .planning/phases/00-golden-path/golden-path-UAT.md
-Resume command: /gsd:verify-work (will detect active session and offer to resume)
+Resume action: Fix the two bugs in UAT gaps, then resume UAT from test 8. Use `npm run dev` for local testing (not `netlify dev`).

@@ -3,7 +3,7 @@ status: testing
 phase: golden-path (Phases 1-6)
 source: 01-03-SUMMARY.md, 02-01-SUMMARY.md, 02-02-SUMMARY.md, 03-01-SUMMARY.md, 03-02-SUMMARY.md, 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 06-01-SUMMARY.md, 06-02-SUMMARY.md, 06-03-SUMMARY.md
 started: 2026-02-08T17:00:00Z
-updated: 2026-02-08T17:45:00Z
+updated: 2026-02-08T18:30:00Z
 ---
 
 ## Current Test
@@ -15,7 +15,7 @@ name: Create New Project — File Upload
 expected: |
 Click "New Project" or navigate to /project/new. File upload UI appears.
 Select an audio/video file. Project appears in sidebar immediately with "uploading" status.
-awaiting: user response
+awaiting: retry after fixes
 
 ## Tests
 
@@ -60,13 +60,15 @@ result: [pending]
 
 expected: Click "New Project" or navigate to /project/new. File upload UI appears. Select an audio/video file. Project appears in sidebar immediately with "uploading" status.
 result: issue
-reported: "Upload failed immediately with 'Transcription Failed' error. Console shows proxy-upload returned ERR_EMPTY_RESPONSE. Also CSP blocked blob: URL for media duration extraction ('Could not extract duration'). Progress stepper briefly appeared before error replaced it."
+reported: "Upload works with Vite dev proxy but clicking project in sidebar during transcription loses progress bar and transcript gets stuck in 'processing' forever. Transcription actually completes in background (console shows full loop completion) but ProjectPage unmounts when user clicks sidebar, killing the useTranscription hook."
 severity: blocker
 
 ### 9. Progress Stepper During Transcription
 
 expected: After file upload starts, see a horizontal 4-stage stepper (Uploading → Processing → Transcribing → Complete). Progress bar fills smoothly. Time estimate appears after initial progress ("Estimating..." then "~N min remaining"). Cancel button visible.
-result: [pending]
+result: issue
+reported: "Progress stepper shows 4 stages but no percentage or meaningful progress. Stages visible but progress bar appears empty/static. Time estimate not updating. Upload phase too fast to see (local proxy). Processing phase: progress only updates when segments stream in."
+severity: major
 
 ### 10. Live Transcript — Segments Appear
 
@@ -138,25 +140,37 @@ result: [pending]
 
 total: 22
 passed: 4
-issues: 1
-pending: 15
+issues: 2
+pending: 14
 skipped: 2
 
 ## Gaps
 
-- truth: "User can upload a file and transcription begins with visible progress"
+- truth: "User can upload a file and see transcription progress without losing it"
   status: failed
-  reason: "Upload failed with ERR_EMPTY_RESPONSE from proxy-upload edge function. CSP also blocked blob: URL for duration extraction. Netlify dev server crashed (WebSocket flood from missing ws: in CSP connect-src)."
+  reason: "Clicking project in sidebar during active transcription unmounts ProjectPage, killing useTranscription hook. Transcription completes in background but dispatch goes nowhere. Project stuck in 'processing' forever."
   severity: blocker
   test: 8
-  root_cause: "Two CSP issues in netlify.toml: (1) missing media-src blob: directive blocked audio duration extraction, (2) missing ws://localhost:\* in connect-src caused Vite HMR WebSocket reconnect flood that crashed netlify dev, which caused proxy-upload to return empty response."
+  root_cause: "Transcription state lives in useTranscription hook inside ProjectPage. When user navigates via sidebar click to /project/{id}, CenterPanel renders TranscriptPanel instead of ProjectPage. Hook unmounts, state lost. Fix 1 (commit e782ace) prevented auto-navigate but not manual sidebar clicks."
   artifacts:
-  - path: "netlify.toml"
-    issue: "CSP missing media-src blob: and ws://localhost:\* in connect-src"
+  - path: "src/features/dashboard/components/CenterPanel.tsx"
+    issue: "Routes to TranscriptPanel for all non-'new' project IDs, including actively-transcribing ones"
+  - path: "src/features/project/ProjectPage.tsx"
+    issue: "Transcription state is local to this component, not in a shared context"
     missing:
-  - "Add media-src 'self' blob: to CSP"
-  - "Add ws://localhost:_ wss://localhost:_ to connect-src"
-    debug_session: ""
+  - "CenterPanel must render ProjectPage (not TranscriptPanel) for projects in uploading/processing state during the active session"
+  - "OR: sidebar click on active-transcription project should navigate to /project/new instead of /project/{id}"
+
+- truth: "Progress stepper shows meaningful progress percentage and time estimate"
+  status: failed
+  reason: "Progress bar shows stages but no visible percentage fill. Time estimate not updating. Upload too fast to observe locally."
+  severity: major
+  test: 9
+  root_cause: "Needs investigation. ProgressStepper receives progress prop from getUnifiedProgress but bar may not be visually updating. Also time estimate depends on progress > 5% and elapsed > 3s."
+  artifacts:
+  - path: "src/features/project/components/ProgressStepper.tsx"
+    issue: "Bar may not show visual progress — check width style binding"
+    missing: []
 
 ## Fixes Applied During UAT
 
@@ -164,9 +178,22 @@ skipped: 2
 
 **Bug:** CenterPanel swapped from ProjectPage (with ProgressStepper) to TranscriptPanel (spinner only) when handleFileSelected navigated from /project/new to /project/{id}.
 **Fix:** Removed navigate from handleFileSelected. Now stays on /project/new during active transcription. Navigates to real project URL on completion/error/cancel.
+**Status:** Committed. Partially fixes the issue — prevents auto-navigate but not manual sidebar clicks.
 
-### Fix 2: CSP updates for dev compatibility (not yet committed)
+### Fix 2: CSP updates for dev compatibility (commit fbc5c72)
 
-**Bug:** netlify.toml CSP blocked (1) Vite inline scripts (script-src), (2) blob: URLs for audio duration (media-src), (3) Vite HMR WebSocket (connect-src ws:).
-**Fix:** Added 'unsafe-inline' to script-src, media-src 'self' blob:, ws://localhost:_ wss://localhost:_ to connect-src.
-**Status:** Edited but not committed. Needs verification that upload works after restart.
+**Bug:** netlify.toml CSP blocked Vite inline scripts, blob: URLs for audio duration, and Vite HMR WebSocket.
+**Fix:** Added 'unsafe-inline' to script-src, media-src 'self' blob:, ws://localhost:\* to connect-src.
+**Status:** Committed.
+
+### Fix 3: Vite dev proxy plugin (uncommitted)
+
+**Bug:** Netlify CLI edge function runtime crashes with "Stream body too big" on file uploads.
+**Fix:** Added devApiProxy() Vite plugin in vite.config.ts that handles /api/gemini-upload and /proxy-upload directly in Node.js dev server. Bypasses Netlify CLI entirely for local dev.
+**Status:** Working but uncommitted. Use `npm run dev` (not `netlify dev`) for local testing.
+
+## Known Issues for Next Session
+
+1. **BLOCKER: Sidebar navigation kills transcription** — Need to prevent ProjectPage unmount during active transcription. Best approach: make CenterPanel aware of active transcription state and keep rendering ProjectPage.
+2. **MAJOR: Progress bar not showing visual progress** — Investigate ProgressStepper.tsx width style binding.
+3. **Dev server: use `npm run dev` not `netlify dev`** — Vite dev proxy handles API routes locally.
