@@ -137,11 +137,13 @@ Plans:
 4. Partial results are saved to localStorage during processing (survives interruptions)
 5. Interrupted transcriptions are detected on app reload and show partial data with retry option
 6. Progress display shows stage-based progress (uploading → transcribing → complete)
-   **Plans**: TBD
+   **Plans**: 3 plans
 
 Plans:
 
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md — AbortController threading, state machine extension (cancel/cancelled), debounced partial persistence
+- [ ] 06-02-PLAN.md — ProgressStepper, LiveTranscriptView, useAutoScroll hook, CSS animations, react-intersection-observer
+- [ ] 06-03-PLAN.md — Integration: rewire ProjectPage, cancel confirmation, recovery UI, sidebar indicator
 
 ### Phase 7: UI/UX Polish
 
