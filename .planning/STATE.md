@@ -5,40 +5,41 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 6 complete, ready for Phase 7
+**Current focus:** Phase 6.1 in progress -- lifting transcription state to context provider
 
 ## Current Position
 
-Phase: 6 of 9 (Enhanced Transcription Experience)
-Plan: 3 of 3
-Status: Phase complete
-Last activity: 2026-02-08 -- Phase 6 complete (all 3 plans, verification passed)
+Phase: 6.1 of 9 (Transcription State Architecture)
+Plan: 1 of 3
+Status: Plan 01 complete
+Last activity: 2026-02-08 -- Plan 01 complete (TranscriptionContext provider, interrupted status, sonner)
 
-Progress: [████████████████░░░░] ~53% (16 plans of ~30+ estimated total)
+Progress: [█████████████████░░░] ~56% (17 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 16
-- Average duration: ~3m 10s
-- Total execution time: ~0.84 hours
+- Total plans completed: 17
+- Average duration: ~3m 07s
+- Total execution time: ~0.88 hours
 
 **By Phase:**
 
-| Phase                                | Plans | Total    | Avg/Plan |
-| ------------------------------------ | ----- | -------- | -------- |
-| 01-security-hardening                | 3/3   | ~5m 29s  | ~1m 50s  |
-| 02-development-tooling               | 2/2   | ~7m 43s  | ~3m 52s  |
-| 03-storage-foundation                | 2/2   | ~6m 10s  | ~3m 05s  |
-| 04-core-architecture-refactor        | 3/3   | ~14m 59s | ~5m 00s  |
-| 05-multi-project-dashboard           | 3/3   | ~8m 00s  | ~2m 40s  |
-| 06-enhanced-transcription-experience | 3/3   | ~9m 33s  | ~3m 11s  |
+| Phase                                 | Plans | Total    | Avg/Plan |
+| ------------------------------------- | ----- | -------- | -------- |
+| 01-security-hardening                 | 3/3   | ~5m 29s  | ~1m 50s  |
+| 02-development-tooling                | 2/2   | ~7m 43s  | ~3m 52s  |
+| 03-storage-foundation                 | 2/2   | ~6m 10s  | ~3m 05s  |
+| 04-core-architecture-refactor         | 3/3   | ~14m 59s | ~5m 00s  |
+| 05-multi-project-dashboard            | 3/3   | ~8m 00s  | ~2m 40s  |
+| 06-enhanced-transcription-experience  | 3/3   | ~9m 33s  | ~3m 11s  |
+| 06.1-transcription-state-architecture | 1/3   | ~2m 34s  | ~2m 34s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 05-03 (2m 00s), 06-01 (4m 01s), 06-02 (3m 12s), 06-03 (2m 20s)
-- Trend: Phase 6 integration wiring complete; all 7 TRNS requirements connected end-to-end
+- Last 5 plans: 06-01 (4m 01s), 06-02 (3m 12s), 06-03 (2m 20s), 06.1-01 (2m 34s)
+- Trend: Phase 6.1 started; TranscriptionContext provider created with split state/actions
 
 _Updated after each plan completion_
 
@@ -117,6 +118,15 @@ Recent decisions affecting current work:
 - CANCELLING and CANCELLED added to TranscriptionStatus enum for complete status mapping (06-03)
 - statusMap updated: cancelling/cancelled map to their own enum values, not aliased to PROCESSING/IDLE (06-03)
 - CenterPanel unchanged in 06-03: no status guards block cancelled projects from reaching TranscriptPanel (06-03)
+- Split TranscriptionContext into TranscriptionStateContext and TranscriptionActionsContext for render optimization (06.1-01)
+- Provider manages full project lifecycle status updates internally, not delegated to consuming components (06.1-01)
+- Interrupt detection depends on projectsState.initialized to avoid race with ProjectsContext loading (06.1-01)
+- beforeunload handler additive with existing storageService handler, both idempotent (06.1-01)
+- SettingsProvider > ProjectsProvider > TranscriptionProvider > BrowserRouter nesting order in App.tsx (06.1-01)
+
+### Roadmap Evolution
+
+- Phase 06.1 inserted after Phase 6: Transcription State Architecture (URGENT) — Golden-path UAT revealed that transcription state lives inside ProjectPage component and is destroyed on any navigation. Multi-project workflow is fundamentally broken. Must lift transcription into a context provider that survives route changes.
 
 ### Pending Todos
 
@@ -149,6 +159,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Golden-path UAT paused. Blocker found: transcription state lives in ProjectPage component — navigating away kills it. Multi-project workflow fundamentally broken. Needs architectural fix (lift transcription to context) before UAT can continue. Inserting Phase 6.1.
-Resume file: .planning/phases/00-golden-path/golden-path-UAT.md
-Resume action: Plan and execute Phase 6.1 (Transcription State Architecture), then resume UAT.
+Stopped at: Completed 06.1-01-PLAN.md (TranscriptionContext provider, interrupted status, sonner). Plans 02 and 03 remain.
+Resume file: .planning/phases/06.1-transcription-state-architecture/06.1-01-SUMMARY.md
+Resume action: Execute Plan 02 (TranscriptionWatcher + sidebar indicators) then Plan 03 (ProjectPage refactor to consume context).
