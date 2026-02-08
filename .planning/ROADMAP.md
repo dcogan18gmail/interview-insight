@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Development Tooling** - ESLint, Prettier, pre-commit hooks, TypeScript strict mode
 - [x] **Phase 3: Storage Foundation** - Versioned localStorage with migrations, quota handling, corruption recovery
 - [x] **Phase 4: Core Architecture Refactor** - Decompose App.tsx into modules, extract hooks, fix memory leaks
-- [ ] **Phase 5: Multi-Project Dashboard** - Project list UI, CRUD operations, navigation
+- [x] **Phase 5: Multi-Project Dashboard** - Project list UI, CRUD operations, navigation
 - [ ] **Phase 6: Enhanced Transcription Experience** - Full transcript visibility, cancel/retry, progress stages
 - [ ] **Phase 7: UI/UX Polish** - Loading states, error handling, accessibility, empty states
 - [ ] **Phase 8: Testing Coverage** - Vitest setup, critical path tests, component tests
@@ -120,9 +120,9 @@ Plans:
 
 Plans:
 
-- [ ] 05-01-PLAN.md — Schema extension (v1->v2 migration) + 3-panel layout shell + collapsible sidebar
-- [ ] 05-02-PLAN.md — Sidebar CRUD (inline rename, three-dot delete, ConfirmDialog) + project creation wiring to storage
-- [ ] 05-03-PLAN.md — Center panel content states (welcome, onboarding, transcript) + editable metadata panel with "needs info" indicators
+- [x] 05-01-PLAN.md — Schema extension (v1->v2 migration) + 3-panel layout shell + collapsible sidebar
+- [x] 05-02-PLAN.md — Sidebar CRUD (inline rename, three-dot delete, ConfirmDialog) + project creation wiring to storage
+- [x] 05-03-PLAN.md — Center panel content states (welcome, onboarding, transcript) + editable metadata panel with "needs info" indicators
 
 ### Phase 6: Enhanced Transcription Experience
 
@@ -208,7 +208,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Development Tooling               | 2/2            | Complete    | 2026-02-07 |
 | 3. Storage Foundation                | 2/2            | Complete    | 2026-02-07 |
 | 4. Core Architecture Refactor        | 3/3            | Complete    | 2026-02-08 |
-| 5. Multi-Project Dashboard           | 0/3            | Not started | -          |
+| 5. Multi-Project Dashboard           | 3/3            | Complete    | 2026-02-08 |
 | 6. Enhanced Transcription Experience | 0/TBD          | Not started | -          |
 | 7. UI/UX Polish                      | 0/TBD          | Not started | -          |
 | 8. Testing Coverage                  | 0/TBD          | Not started | -          |
