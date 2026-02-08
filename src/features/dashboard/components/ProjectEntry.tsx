@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useProjects } from '@/contexts/ProjectsContext';
+import { useTranscriptionState } from '@/contexts/TranscriptionContext';
 import type { ProjectMetadata } from '@/services/storageService.types';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -21,6 +22,12 @@ export default function ProjectEntry({
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { updateProject, removeProject } = useProjects();
+  const transcriptionState = useTranscriptionState();
+
+  // Active transcription detection via context
+  const isActivelyTranscribing =
+    transcriptionState.activeProjectId === project.id &&
+    transcriptionState.isTranscribing;
 
   // Inline rename state
   const [editing, setEditing] = useState(false);
@@ -120,21 +127,16 @@ export default function ProjectEntry({
     setConfirmDelete(false);
   };
 
-  // --- Incomplete indicator ---
+  // --- Incomplete indicator (only for cancelled/error, not interrupted or actively transcribing) ---
   const isIncomplete =
-    project.status === 'cancelled' || project.status === 'error';
+    !isActivelyTranscribing &&
+    project.status !== 'interrupted' &&
+    (project.status === 'cancelled' || project.status === 'error');
 
-  // --- Navigation ---
+  // --- Navigation (free navigation -- transcription survives route changes via context) ---
 
   const handleClick = () => {
     if (!editing) {
-      // If the project is actively transcribing (uploading/processing) and we're
-      // currently on /project/new, stay there to avoid unmounting the transcription hook.
-      const isActivelyTranscribing =
-        project.status === 'uploading' || project.status === 'processing';
-      if (isActivelyTranscribing && projectId === 'new') {
-        return; // No-op: transcription is in progress on /project/new
-      }
       navigate(`/project/${project.id}`);
     }
   };
@@ -182,6 +184,21 @@ export default function ProjectEntry({
               >
                 {getProjectLabel(project)}
               </div>
+              {/* Active transcription: animated spinner */}
+              {isActivelyTranscribing && (
+                <span
+                  className="ml-1.5 inline-block h-2 w-2 flex-shrink-0 animate-spin rounded-full border border-indigo-500 border-t-transparent"
+                  title="Transcribing..."
+                />
+              )}
+              {/* Interrupted: orange pulsing dot */}
+              {!isActivelyTranscribing && project.status === 'interrupted' && (
+                <span
+                  className="ml-1.5 inline-block h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-orange-400"
+                  title="Transcription interrupted — click to resume"
+                />
+              )}
+              {/* Cancelled or error: amber dot */}
               {isIncomplete && (
                 <span
                   className="ml-1.5 inline-block h-2 w-2 flex-shrink-0 rounded-full bg-amber-400"

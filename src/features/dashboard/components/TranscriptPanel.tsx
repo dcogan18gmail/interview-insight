@@ -123,6 +123,45 @@ export default function TranscriptPanel({ project }: TranscriptPanelProps) {
     );
   }
 
+  // --- Interrupted: show recovery card (distinct from cancelled) ---
+  if (project.status === 'interrupted') {
+    return (
+      <div className="p-6">
+        {/* Interrupted recovery card */}
+        <div className="mb-6 rounded-lg border border-orange-200 bg-orange-50 p-4">
+          <h3 className="text-sm font-semibold text-orange-900">
+            Transcription was interrupted
+          </h3>
+          <p className="mt-1 text-sm text-orange-700">
+            This transcription was interrupted by a page refresh or browser
+            crash.
+            {project.segmentCount > 0
+              ? ` ${project.segmentCount} segment${project.segmentCount !== 1 ? 's' : ''} were recovered.`
+              : ' No segments were saved.'}
+          </p>
+          <div className="mt-3 flex gap-3">
+            <button
+              onClick={() => navigate('/project/new')}
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+            >
+              Resume Transcription
+            </button>
+          </div>
+        </div>
+
+        {/* Show partial transcript if available */}
+        {segments && segments.length > 0 && (
+          <div className="opacity-70">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+              Partial Transcript
+            </p>
+            <TranscriptView transcript={segments} projectName={project.name} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // --- Cancelled: show recovery card with partial transcript ---
   if (project.status === 'cancelled') {
     return (
