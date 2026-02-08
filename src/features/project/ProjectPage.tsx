@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranscription } from '@/features/project/hooks/useTranscription';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useProjects } from '@/contexts/ProjectsContext';
+import { saveTranscript } from '@/services/storageService';
 import FileUpload from '@/features/project/components/FileUpload';
 import LoadingState from '@/features/project/components/LoadingState';
 import TranscriptView from '@/features/project/components/TranscriptView';
@@ -11,22 +14,85 @@ export default function ProjectPage() {
   const navigate = useNavigate();
   const { state: settingsState } = useSettings();
   const { machineState, startTranscription, reset } = useTranscription();
+  const { state: projectsState, createProject, updateProject } = useProjects();
 
   const isNew = projectId === 'new';
-  const _ = isNew; // Acknowledge -- existing project loading deferred to Phase 5
 
+  // Track the created project ID for the new project flow
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+
+  // --- Existing project loading ---
+  const existingProject =
+    !isNew && projectId
+      ? (projectsState.projects.find((p) => p.id === projectId) ?? null)
+      : null;
+
+  // Redirect if existing project not found (after initialization)
+  useEffect(() => {
+    if (!isNew && projectId && projectsState.initialized && !existingProject) {
+      navigate('/', { replace: true });
+    }
+  }, [isNew, projectId, projectsState.initialized, existingProject, navigate]);
+
+  // --- New project: handle file selection and start transcription ---
   const handleFileSelected = (fileData: FileData) => {
     if (!fileData.file) return;
     if (!settingsState.apiKeyConfigured) {
       navigate('/settings');
       return;
     }
+
+    // Create project in storage immediately
+    const fileInfo = {
+      name: fileData.name,
+      type: fileData.type,
+      size: fileData.size,
+      duration: fileData.duration,
+    };
+    const { project, ok } = createProject(fileData.name, fileInfo);
+    if (ok) {
+      setCreatedProjectId(project.id);
+      navigate(`/project/${project.id}`, { replace: true });
+    }
+
     startTranscription(fileData.file, fileData.type, fileData.duration);
   };
 
-  const handleReset = () => {
-    reset();
-  };
+  // --- Update project status through transcription lifecycle ---
+  useEffect(() => {
+    const targetId = createdProjectId;
+    if (!targetId) return;
+
+    const project = projectsState.projects.find((p) => p.id === targetId);
+    if (!project) return;
+
+    if (machineState.state === 'uploading' && project.status !== 'uploading') {
+      updateProject({ ...project, status: 'uploading' });
+    } else if (
+      machineState.state === 'processing' &&
+      project.status !== 'processing'
+    ) {
+      updateProject({ ...project, status: 'processing' });
+    } else if (
+      machineState.state === 'completed' &&
+      project.status !== 'completed'
+    ) {
+      saveTranscript({
+        projectId: targetId,
+        segments: machineState.transcript,
+        completedAt: new Date().toISOString(),
+      });
+      updateProject({ ...project, status: 'completed' });
+    } else if (machineState.state === 'error' && project.status !== 'error') {
+      updateProject({ ...project, status: 'error' });
+    }
+  }, [
+    machineState.state,
+    createdProjectId,
+    projectsState.projects,
+    updateProject,
+    machineState.transcript,
+  ]);
 
   // Map hook state names to the TranscriptionStatus enum used by LoadingState
   const statusMap: Record<string, TranscriptionStatus> = {
@@ -40,6 +106,28 @@ export default function ProjectPage() {
   const displayStatus =
     statusMap[machineState.state] ?? TranscriptionStatus.IDLE;
 
+  const handleReset = () => {
+    reset();
+    setCreatedProjectId(null);
+    navigate('/project/new', { replace: true });
+  };
+
+  // --- Render for existing project (not a newly created one) ---
+  if (!isNew && existingProject && !createdProjectId) {
+    return (
+      <div className="p-8">
+        <h2 className="text-xl font-bold text-slate-800">
+          {existingProject.interviewee ?? existingProject.name}
+        </h2>
+        <p className="mt-2 text-sm text-slate-500">
+          Status: {existingProject.status} &middot;{' '}
+          {existingProject.segmentCount} segments
+        </p>
+      </div>
+    );
+  }
+
+  // --- Render for new/in-progress project ---
   return (
     <div className="flex flex-col items-center">
       {/* API Key Required Prompt */}
