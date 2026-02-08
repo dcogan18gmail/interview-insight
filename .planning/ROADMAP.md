@@ -116,11 +116,12 @@ Plans:
 2. User can create a new project which triggers upload flow
 3. User can rename a project
 4. User can delete a project with confirmation dialog
-   **Plans**: TBD
+   **Plans**: 2 plans
 
 Plans:
 
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Dashboard UI with ProjectCard (responsive grid, inline rename, delete confirmation, empty state)
+- [ ] 05-02-PLAN.md — Project creation flow + existing project loading (persist transcripts, load from storage, project-not-found redirect)
 
 ### Phase 6: Enhanced Transcription Experience
 
