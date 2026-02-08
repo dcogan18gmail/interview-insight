@@ -2,7 +2,7 @@ import { NavLink, Outlet } from 'react-router';
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans text-slate-800">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 to-slate-100 font-sans text-slate-800">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -68,7 +68,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-10">
+      <main className="flex-1">
         <Outlet />
       </main>
     </div>

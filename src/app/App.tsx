@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router';
 import { SettingsProvider } from '@/contexts/SettingsContext';
 import { ProjectsProvider } from '@/contexts/ProjectsContext';
 import Layout from './Layout';
-import DashboardPage from '@/features/dashboard/DashboardPage';
-import ProjectPage from '@/features/project/ProjectPage';
+import DashboardLayout from '@/features/dashboard/DashboardLayout';
+import CenterPanel from '@/features/dashboard/components/CenterPanel';
 import SettingsPage from '@/features/settings/SettingsPage';
 
 export default function App() {
@@ -13,8 +13,10 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route element={<Layout />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="project/:projectId" element={<ProjectPage />} />
+              <Route element={<DashboardLayout />}>
+                <Route index element={<CenterPanel />} />
+                <Route path="project/:projectId" element={<CenterPanel />} />
+              </Route>
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>

@@ -7,7 +7,7 @@ export default function SettingsPage() {
   const report = getStorageReport();
 
   return (
-    <div className="mx-auto max-w-md">
+    <div className="mx-auto max-w-md px-6 py-10">
       {/* Back link */}
       <button
         onClick={() => navigate('/')}
