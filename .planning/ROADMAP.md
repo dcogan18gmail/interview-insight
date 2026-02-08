@@ -107,21 +107,22 @@ Plans:
 
 ### Phase 5: Multi-Project Dashboard
 
-**Goal**: Users can manage multiple interview projects with CRUD operations
+**Goal**: Users can manage multiple interview projects with CRUD operations in a 3-panel Linear-inspired layout
 **Depends on**: Phase 3 (storage foundation), Phase 4 (architecture with routing and contexts)
 **Requirements**: PROJ-01, PROJ-02, PROJ-03, PROJ-04
 **Success Criteria** (what must be TRUE):
 
-1. User sees project dashboard as landing page with list/grid of all projects
-2. User can create a new project which triggers upload flow
-3. User can rename a project
-4. User can delete a project with confirmation dialog
-   **Plans**: 2 plans
+1. User sees 3-panel dashboard (sidebar, center transcript, right metadata) as landing page
+2. User can create a new project which triggers upload flow and persists to storage
+3. User can rename a project via double-click inline edit in sidebar
+4. User can delete a project via three-dot menu with confirmation dialog
+   **Plans**: 3 plans
 
 Plans:
 
-- [ ] 05-01-PLAN.md — Dashboard UI with ProjectCard (responsive grid, inline rename, delete confirmation, empty state)
-- [ ] 05-02-PLAN.md — Project creation flow + existing project loading (persist transcripts, load from storage, project-not-found redirect)
+- [ ] 05-01-PLAN.md — Schema extension (v1->v2 migration) + 3-panel layout shell + collapsible sidebar
+- [ ] 05-02-PLAN.md — Sidebar CRUD (inline rename, three-dot delete, ConfirmDialog) + project creation wiring to storage
+- [ ] 05-03-PLAN.md — Center panel content states (welcome, onboarding, transcript) + editable metadata panel with "needs info" indicators
 
 ### Phase 6: Enhanced Transcription Experience
 
@@ -207,7 +208,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Development Tooling               | 2/2            | Complete    | 2026-02-07 |
 | 3. Storage Foundation                | 2/2            | Complete    | 2026-02-07 |
 | 4. Core Architecture Refactor        | 3/3            | Complete    | 2026-02-08 |
-| 5. Multi-Project Dashboard           | 0/TBD          | Not started | -          |
+| 5. Multi-Project Dashboard           | 0/3            | Not started | -          |
 | 6. Enhanced Transcription Experience | 0/TBD          | Not started | -          |
 | 7. UI/UX Polish                      | 0/TBD          | Not started | -          |
 | 8. Testing Coverage                  | 0/TBD          | Not started | -          |
