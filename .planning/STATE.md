@@ -149,6 +149,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Golden-path UAT — 9 fixes applied (Fixes 1-9 + stepper anchoring). 6 passed, 13 pending (including 4 retests of fixed bugs), 3 skipped. All fixes committed and pushed.
+Stopped at: Golden-path UAT paused. Blocker found: transcription state lives in ProjectPage component — navigating away kills it. Multi-project workflow fundamentally broken. Needs architectural fix (lift transcription to context) before UAT can continue. Inserting Phase 6.1.
 Resume file: .planning/phases/00-golden-path/golden-path-UAT.md
-Resume action: Clear localStorage, restart `npm run dev`, full retest starting from test 7. See UAT file for test-by-test expected behaviors.
+Resume action: Plan and execute Phase 6.1 (Transcription State Architecture), then resume UAT.
