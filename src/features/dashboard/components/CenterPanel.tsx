@@ -1,5 +1,6 @@
 import { useParams } from 'react-router';
 import { useProjects } from '@/contexts/ProjectsContext';
+import { useTranscriptionState } from '@/contexts/TranscriptionContext';
 import ProjectPage from '@/features/project/ProjectPage';
 import WelcomeView from './WelcomeView';
 import OnboardingView from './OnboardingView';
@@ -9,6 +10,7 @@ export default function CenterPanel() {
   const { projectId } = useParams();
   const { state } = useProjects();
   const { projects } = state;
+  const transcriptionState = useTranscriptionState();
 
   // No project selected -- choose between onboarding and welcome
   if (!projectId) {
@@ -18,7 +20,7 @@ export default function CenterPanel() {
     return <WelcomeView />;
   }
 
-  // New project -- render existing file upload flow
+  // New project -- render file upload flow
   if (projectId === 'new') {
     return (
       <div className="mx-auto max-w-2xl px-6 py-10">
@@ -27,7 +29,7 @@ export default function CenterPanel() {
     );
   }
 
-  // Existing project -- look up and render transcript panel
+  // Existing project -- look up
   const project = projects.find((p) => p.id === projectId);
 
   if (!project) {
@@ -60,5 +62,18 @@ export default function CenterPanel() {
     );
   }
 
+  // Active transcription on this project -- show live view via ProjectPage
+  if (
+    transcriptionState.activeProjectId === projectId &&
+    transcriptionState.isTranscribing
+  ) {
+    return (
+      <div className="mx-auto max-w-2xl px-6 py-10">
+        <ProjectPage />
+      </div>
+    );
+  }
+
+  // Completed/idle/etc -- show TranscriptPanel
   return <TranscriptPanel project={project} />;
 }

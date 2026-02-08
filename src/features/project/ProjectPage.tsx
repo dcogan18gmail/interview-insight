@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useTranscription } from '@/features/project/hooks/useTranscription';
+import {
+  useTranscriptionState,
+  useTranscriptionActions,
+} from '@/contexts/TranscriptionContext';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useProjects } from '@/contexts/ProjectsContext';
-import { saveTranscript } from '@/services/storageService';
 import FileUpload from '@/features/project/components/FileUpload';
 import ProgressStepper from '@/features/project/components/ProgressStepper';
 import LiveTranscriptView from '@/features/project/components/LiveTranscriptView';
 import TranscriptView from '@/features/project/components/TranscriptView';
 import ConfirmDialog from '@/features/dashboard/components/ConfirmDialog';
-import { FileData, TranscriptionStatus } from '@/types';
+import { FileData } from '@/types';
 
 // --- Progress mapping helpers ---
 
@@ -38,9 +40,9 @@ export default function ProjectPage() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { state: settingsState } = useSettings();
-  const { machineState, startTranscription, cancel, reset } =
-    useTranscription();
-  const { state: projectsState, createProject, updateProject } = useProjects();
+  const transcriptionState = useTranscriptionState();
+  const { startTranscription, cancel, reset } = useTranscriptionActions();
+  const { state: projectsState, createProject } = useProjects();
 
   const isNew = projectId === 'new';
 
@@ -73,12 +75,40 @@ export default function ProjectPage() {
     }
   }, [isNew, projectId, projectsState.initialized, existingProject, navigate]);
 
+  // --- Reactive navigation on completion/error/cancelled ---
+  useEffect(() => {
+    if (!createdProjectId) return;
+
+    // Only navigate when the active transcription matches our created project
+    if (transcriptionState.activeProjectId !== createdProjectId) return;
+
+    if (transcriptionState.state === 'completed') {
+      navigate(`/project/${createdProjectId}`, { replace: true });
+      setCreatedProjectId(null);
+      setStepperDismissed(false);
+    } else if (transcriptionState.state === 'error') {
+      navigate(`/project/${createdProjectId}`, { replace: true });
+    } else if (transcriptionState.state === 'cancelled') {
+      navigate(`/project/${createdProjectId}`, { replace: true });
+    }
+  }, [
+    transcriptionState.state,
+    transcriptionState.activeProjectId,
+    createdProjectId,
+    navigate,
+  ]);
+
   // --- New project: handle file selection and start transcription ---
   const handleFileSelected = (fileData: FileData) => {
     if (!fileData.file) return;
     if (!settingsState.apiKeyConfigured) {
       navigate('/settings');
       return;
+    }
+
+    // Block if transcription already in progress
+    if (transcriptionState.isTranscribing) {
+      return; // Guard handled in render below
     }
 
     // Create project in storage immediately
@@ -91,9 +121,6 @@ export default function ProjectPage() {
     const { project, ok } = createProject(fileData.name, fileInfo);
     if (ok) {
       setCreatedProjectId(project.id);
-      // Don't navigate yet — stay on /project/new so CenterPanel keeps rendering
-      // ProjectPage (with ProgressStepper + LiveTranscriptView).
-      // Navigate to the real project URL on completion/error/cancel.
     }
 
     startTranscription(
@@ -103,88 +130,6 @@ export default function ProjectPage() {
       project.id
     );
   };
-
-  // --- Update project status through transcription lifecycle ---
-  useEffect(() => {
-    const targetId = createdProjectId;
-    if (!targetId) return;
-
-    const project = projectsState.projects.find((p) => p.id === targetId);
-    if (!project) return;
-
-    if (machineState.state === 'uploading' && project.status !== 'uploading') {
-      updateProject({ ...project, status: 'uploading' });
-    } else if (
-      machineState.state === 'processing' &&
-      project.status !== 'processing'
-    ) {
-      updateProject({ ...project, status: 'processing' });
-    } else if (
-      machineState.state === 'completed' &&
-      project.status !== 'completed'
-    ) {
-      const segments = machineState.transcript;
-      saveTranscript({
-        projectId: targetId,
-        segments,
-        completedAt: new Date().toISOString(),
-      });
-
-      // Reconcile metadata: include correct segmentCount and update duration
-      // if transcript timestamps exceed browser-detected duration.
-      const maxTimestamp =
-        segments.length > 0
-          ? Math.max(...segments.map((s) => s.timestamp ?? 0))
-          : 0;
-      const reconciledDuration =
-        maxTimestamp > project.fileInfo.duration
-          ? maxTimestamp
-          : project.fileInfo.duration;
-
-      updateProject({
-        ...project,
-        status: 'completed',
-        segmentCount: segments.length,
-        fileInfo: { ...project.fileInfo, duration: reconciledDuration },
-      });
-      // Navigate to the real project URL now that transcription is done
-      navigate(`/project/${targetId}`, { replace: true });
-    } else if (machineState.state === 'error' && project.status !== 'error') {
-      updateProject({ ...project, status: 'error' });
-      navigate(`/project/${targetId}`, { replace: true });
-    } else if (
-      machineState.state === 'cancelled' &&
-      project.status !== 'cancelled'
-    ) {
-      updateProject({
-        ...project,
-        status: 'cancelled',
-        segmentCount: machineState.transcript.length,
-      });
-      navigate(`/project/${targetId}`, { replace: true });
-    }
-  }, [
-    machineState.state,
-    createdProjectId,
-    projectsState.projects,
-    updateProject,
-    machineState.transcript,
-    navigate,
-  ]);
-
-  // Map hook state names to the TranscriptionStatus enum
-  const statusMap: Record<string, TranscriptionStatus> = {
-    idle: TranscriptionStatus.IDLE,
-    uploading: TranscriptionStatus.UPLOADING,
-    processing: TranscriptionStatus.PROCESSING,
-    cancelling: TranscriptionStatus.CANCELLING,
-    cancelled: TranscriptionStatus.CANCELLED,
-    completed: TranscriptionStatus.COMPLETED,
-    error: TranscriptionStatus.ERROR,
-  };
-
-  const _displayStatus =
-    statusMap[machineState.state] ?? TranscriptionStatus.IDLE;
 
   const handleReset = () => {
     reset();
@@ -201,7 +146,62 @@ export default function ProjectPage() {
   };
   const handleCancelDismiss = () => setShowCancelConfirm(false);
 
-  // --- Render for existing project (not a newly created one) ---
+  // --- Active transcription: determine if we should show live view ---
+  const isActiveTranscriptionProject =
+    transcriptionState.activeProjectId === projectId &&
+    transcriptionState.isTranscribing;
+
+  // --- Render for existing project that IS the actively transcribing project ---
+  if (!isNew && existingProject && isActiveTranscriptionProject) {
+    return (
+      <div className="flex flex-col items-center">
+        <div className="w-full">
+          <ProgressStepper
+            currentStage={getProgressStage(
+              transcriptionState.state,
+              transcriptionState.progress
+            )}
+            progress={getUnifiedProgress(
+              transcriptionState.state,
+              transcriptionState.progress
+            )}
+            timeEstimate={null}
+            onCancel={
+              transcriptionState.state !== 'cancelling' &&
+              transcriptionState.state !== 'completed'
+                ? handleCancelClick
+                : undefined
+            }
+            isComplete={transcriptionState.state === 'completed'}
+            onFadeOutDone={handleStepperDone}
+          />
+
+          {transcriptionState.state !== 'completed' && (
+            <div className="mt-4" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+              <LiveTranscriptView
+                segments={transcriptionState.transcript}
+                staleSegments={transcriptionState.staleSegments}
+                isStreaming={transcriptionState.state !== 'cancelling'}
+              />
+            </div>
+          )}
+        </div>
+
+        <ConfirmDialog
+          open={showCancelConfirm}
+          title="Cancel Transcription"
+          message="Cancel transcription? Partial results will be saved."
+          confirmLabel="Cancel Transcription"
+          cancelLabel="Keep Going"
+          variant="danger"
+          onConfirm={handleConfirmCancel}
+          onCancel={handleCancelDismiss}
+        />
+      </div>
+    );
+  }
+
+  // --- Render for existing project (not actively transcribing) ---
   if (!isNew && existingProject && !createdProjectId) {
     return (
       <div className="p-8">
@@ -220,25 +220,49 @@ export default function ProjectPage() {
   return (
     <div className="flex flex-col items-center">
       {/* API Key Required Prompt */}
-      {machineState.state === 'idle' && !settingsState.apiKeyConfigured && (
+      {transcriptionState.state === 'idle' &&
+        !settingsState.apiKeyConfigured && (
+          <div className="animate-fade-in mb-8 w-full max-w-2xl rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
+            <h3 className="mb-2 text-lg font-semibold text-amber-900">
+              API Key Required
+            </h3>
+            <p className="mb-4 text-amber-700">
+              To get started, you&apos;ll need to add your Gemini API key.
+            </p>
+            <button
+              onClick={() => navigate('/settings')}
+              className="rounded-lg bg-indigo-600 px-6 py-2.5 font-medium text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700"
+            >
+              Open Settings
+            </button>
+          </div>
+        )}
+
+      {/* Transcription Already In Progress Guard */}
+      {isNew && !createdProjectId && transcriptionState.isTranscribing && (
         <div className="animate-fade-in mb-8 w-full max-w-2xl rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
           <h3 className="mb-2 text-lg font-semibold text-amber-900">
-            API Key Required
+            Transcription In Progress
           </h3>
           <p className="mb-4 text-amber-700">
-            To get started, you&apos;ll need to add your Gemini API key.
+            A transcription is already running. Please wait for it to complete
+            before starting a new one.
           </p>
-          <button
-            onClick={() => navigate('/settings')}
-            className="rounded-lg bg-indigo-600 px-6 py-2.5 font-medium text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700"
-          >
-            Open Settings
-          </button>
+          {transcriptionState.activeProjectId && (
+            <button
+              onClick={() =>
+                navigate(`/project/${transcriptionState.activeProjectId}`)
+              }
+              className="rounded-lg bg-indigo-600 px-6 py-2.5 font-medium text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700"
+            >
+              View Active Transcription
+            </button>
+          )}
         </div>
       )}
 
       {/* File Upload Stage */}
-      {machineState.state === 'idle' && (
+      {transcriptionState.state === 'idle' && (
         <div className="animate-fade-in w-full max-w-2xl">
           <FileUpload onFileSelected={handleFileSelected} disabled={false} />
         </div>
@@ -246,38 +270,38 @@ export default function ProjectPage() {
 
       {/* Processing Stage: ProgressStepper + LiveTranscriptView */}
       {/* Keep stepper visible during 'completed' until fade-out finishes */}
-      {(machineState.state === 'uploading' ||
-        machineState.state === 'processing' ||
-        machineState.state === 'cancelling' ||
-        (machineState.state === 'completed' && !stepperDismissed)) && (
+      {(transcriptionState.state === 'uploading' ||
+        transcriptionState.state === 'processing' ||
+        transcriptionState.state === 'cancelling' ||
+        (transcriptionState.state === 'completed' && !stepperDismissed)) && (
         <div className="w-full">
           <ProgressStepper
             currentStage={getProgressStage(
-              machineState.state,
-              machineState.progress
+              transcriptionState.state,
+              transcriptionState.progress
             )}
             progress={getUnifiedProgress(
-              machineState.state,
-              machineState.progress
+              transcriptionState.state,
+              transcriptionState.progress
             )}
             timeEstimate={null}
             onCancel={
-              machineState.state !== 'cancelling' &&
-              machineState.state !== 'completed'
+              transcriptionState.state !== 'cancelling' &&
+              transcriptionState.state !== 'completed'
                 ? handleCancelClick
                 : undefined
             }
-            isComplete={machineState.state === 'completed'}
+            isComplete={transcriptionState.state === 'completed'}
             onFadeOutDone={handleStepperDone}
           />
 
           {/* Live transcript display (hide once completed) */}
-          {machineState.state !== 'completed' && (
+          {transcriptionState.state !== 'completed' && (
             <div className="mt-4" style={{ maxHeight: 'calc(100vh - 250px)' }}>
               <LiveTranscriptView
-                segments={machineState.transcript}
-                staleSegments={machineState.staleSegments}
-                isStreaming={machineState.state !== 'cancelling'}
+                segments={transcriptionState.transcript}
+                staleSegments={transcriptionState.staleSegments}
+                isStreaming={transcriptionState.state !== 'cancelling'}
               />
             </div>
           )}
@@ -285,7 +309,7 @@ export default function ProjectPage() {
       )}
 
       {/* Error Stage */}
-      {machineState.state === 'error' && (
+      {transcriptionState.state === 'error' && (
         <div className="animate-fade-in w-full max-w-2xl rounded-xl border border-red-100 bg-red-50 p-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
             <svg
@@ -306,7 +330,7 @@ export default function ProjectPage() {
             Processing Failed
           </h3>
           <p className="mb-6 text-gray-600">
-            {machineState.error ?? 'Something went wrong.'}
+            {transcriptionState.error ?? 'Something went wrong.'}
           </p>
           <button
             onClick={handleReset}
@@ -318,7 +342,7 @@ export default function ProjectPage() {
       )}
 
       {/* Cancelled Stage: partial transcript + recovery */}
-      {machineState.state === 'cancelled' && (
+      {transcriptionState.state === 'cancelled' && (
         <div className="w-full">
           {/* Inline recovery notification */}
           <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
@@ -326,8 +350,8 @@ export default function ProjectPage() {
               Transcription Cancelled
             </h3>
             <p className="mt-1 text-sm text-amber-700">
-              {machineState.transcript.length} segment
-              {machineState.transcript.length !== 1 ? 's' : ''} saved.
+              {transcriptionState.transcript.length} segment
+              {transcriptionState.transcript.length !== 1 ? 's' : ''} saved.
             </p>
             <div className="mt-3 flex gap-3">
               <button
@@ -340,9 +364,9 @@ export default function ProjectPage() {
           </div>
 
           {/* Show partial transcript */}
-          {machineState.transcript.length > 0 && (
+          {transcriptionState.transcript.length > 0 && (
             <TranscriptView
-              transcript={machineState.transcript}
+              transcript={transcriptionState.transcript}
               projectName={activeProjectName}
             />
           )}
@@ -350,7 +374,7 @@ export default function ProjectPage() {
       )}
 
       {/* Results Stage */}
-      {machineState.state === 'completed' && (
+      {transcriptionState.state === 'completed' && (
         <div className="w-full">
           <div className="mb-4 flex justify-end">
             <button
@@ -374,7 +398,7 @@ export default function ProjectPage() {
             </button>
           </div>
           <TranscriptView
-            transcript={machineState.transcript}
+            transcript={transcriptionState.transcript}
             projectName={activeProjectName}
           />
         </div>
