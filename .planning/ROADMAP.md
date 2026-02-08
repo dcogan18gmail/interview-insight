@@ -97,11 +97,13 @@ Plans:
 5. ObjectURL memory leak is fixed (URL.revokeObjectURL called on cleanup)
 6. Download timing issues are fixed (async/await instead of brittle setTimeout)
 7. Duration extraction handles 0-duration gracefully without silent failure
-   **Plans**: TBD
+   **Plans**: 3 plans
 
 Plans:
 
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Migrate to src/ directory, install deps, create SettingsContext and ProjectsContext
+- [ ] 04-02-PLAN.md — Extract docxExport service, refactor geminiService, create useTranscription hook, fix 3 bugs
+- [ ] 04-03-PLAN.md — Create React Router layout, page components, and wire complete transcription flow
 
 ### Phase 5: Multi-Project Dashboard
 
