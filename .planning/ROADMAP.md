@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Storage Foundation** - Versioned localStorage with migrations, quota handling, corruption recovery
 - [x] **Phase 4: Core Architecture Refactor** - Decompose App.tsx into modules, extract hooks, fix memory leaks
 - [x] **Phase 5: Multi-Project Dashboard** - Project list UI, CRUD operations, navigation
-- [ ] **Phase 6: Enhanced Transcription Experience** - Full transcript visibility, cancel/retry, progress stages
+- [x] **Phase 6: Enhanced Transcription Experience** - Full transcript visibility, cancel/retry, progress stages
 - [ ] **Phase 7: UI/UX Polish** - Loading states, error handling, accessibility, empty states
 - [ ] **Phase 8: Testing Coverage** - Vitest setup, critical path tests, component tests
 - [ ] **Phase 9: Deployment & Documentation** - CI/CD, custom domain, professional README
@@ -141,9 +141,9 @@ Plans:
 
 Plans:
 
-- [ ] 06-01-PLAN.md — AbortController threading, state machine extension (cancel/cancelled), debounced partial persistence
-- [ ] 06-02-PLAN.md — ProgressStepper, LiveTranscriptView, useAutoScroll hook, CSS animations, react-intersection-observer
-- [ ] 06-03-PLAN.md — Integration: rewire ProjectPage, cancel confirmation, recovery UI, sidebar indicator
+- [x] 06-01-PLAN.md — AbortController threading, state machine extension (cancel/cancelled), debounced partial persistence
+- [x] 06-02-PLAN.md — ProgressStepper, LiveTranscriptView, useAutoScroll hook, CSS animations, react-intersection-observer
+- [x] 06-03-PLAN.md — Integration: rewire ProjectPage, cancel confirmation, recovery UI, sidebar indicator
 
 ### Phase 7: UI/UX Polish
 
@@ -213,7 +213,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Storage Foundation                | 2/2            | Complete    | 2026-02-07 |
 | 4. Core Architecture Refactor        | 3/3            | Complete    | 2026-02-08 |
 | 5. Multi-Project Dashboard           | 3/3            | Complete    | 2026-02-08 |
-| 6. Enhanced Transcription Experience | 0/TBD          | Not started | -          |
+| 6. Enhanced Transcription Experience | 3/3            | Complete    | 2026-02-08 |
 | 7. UI/UX Polish                      | 0/TBD          | Not started | -          |
 | 8. Testing Coverage                  | 0/TBD          | Not started | -          |
 | 9. Deployment & Documentation        | 0/TBD          | Not started | -          |
