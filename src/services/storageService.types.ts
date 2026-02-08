@@ -28,7 +28,8 @@ export type ProjectStatus =
   | 'processing'
   | 'completed'
   | 'error'
-  | 'cancelled';
+  | 'cancelled'
+  | 'interrupted';
 
 export interface FileInfo {
   name: string;

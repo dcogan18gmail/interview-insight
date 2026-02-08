@@ -137,6 +137,7 @@ const VALID_PROJECT_STATUSES: ReadonlySet<ProjectStatus> = new Set([
   'completed',
   'error',
   'cancelled',
+  'interrupted',
 ]);
 
 /**
