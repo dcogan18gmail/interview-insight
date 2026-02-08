@@ -140,5 +140,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Phase 6 complete -- all 3 plans executed, verification passed (human_needed)
-Resume file: Next phase (07) planning
+Stopped at: Golden-path UAT in progress (4 passed, 1 blocker, 15 pending). Two fixes applied mid-UAT: (1) route swap bug in ProjectPage.tsx committed as e782ace, (2) CSP fixes in netlify.toml edited but not committed. Need to verify upload works after CSP fix, then continue UAT from test 8.
+Resume file: .planning/phases/00-golden-path/golden-path-UAT.md
+Resume command: /gsd:verify-work (will detect active session and offer to resume)
