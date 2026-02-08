@@ -153,9 +153,9 @@ Plans:
 
 Plans:
 
-- [ ] 06.1-01-PLAN.md — TranscriptionContext provider + interrupted status + sonner install + App.tsx wiring
-- [ ] 06.1-02-PLAN.md — Rewire consumers (ProjectPage, CenterPanel, useTranscription) + TranscriptionWatcher toasts
-- [ ] 06.1-03-PLAN.md — Sidebar indicators (spinner/dots) + TranscriptPanel interrupted UI + Settings API key warning
+- [x] 06.1-01-PLAN.md — TranscriptionContext provider + interrupted status + sonner install + App.tsx wiring
+- [x] 06.1-02-PLAN.md — Rewire consumers (ProjectPage, CenterPanel, useTranscription) + TranscriptionWatcher toasts
+- [x] 06.1-03-PLAN.md — Sidebar indicators (spinner/dots) + TranscriptPanel interrupted UI + Settings API key warning
 
 ### Phase 7: UI/UX Polish
 
@@ -226,6 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Core Architecture Refactor        | 3/3            | Complete    | 2026-02-08 |
 | 5. Multi-Project Dashboard           | 3/3            | Complete    | 2026-02-08 |
 | 6. Enhanced Transcription Experience | 3/3            | Complete    | 2026-02-08 |
+| 6.1 Transcription State Architecture | 3/3            | Complete    | 2026-02-08 |
 | 7. UI/UX Polish                      | 0/TBD          | Not started | -          |
 | 8. Testing Coverage                  | 0/TBD          | Not started | -          |
 | 9. Deployment & Documentation        | 0/TBD          | Not started | -          |
