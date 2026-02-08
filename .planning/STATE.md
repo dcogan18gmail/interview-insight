@@ -107,7 +107,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- **Human UAT pass (Phases 1-5)** — Run `/gsd:verify-work` before Phase 8 (Testing Coverage). Each phase has a "Human Verification Required" section in its VERIFICATION.md with specific test scenarios. Phase 3 storage runtime tests (persistence, corruption recovery, quota, migration, debounced writes, orphan cleanup) were deferred pending app integration — now fully integrated. Do this before writing automated tests so UAT findings can inform test coverage.
 
 ### Blockers/Concerns
 

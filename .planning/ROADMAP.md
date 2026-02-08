@@ -165,8 +165,10 @@ Plans:
 
 ### Phase 8: Testing Coverage
 
+**PREREQUISITE**: Run `/gsd:verify-work` for human UAT of Phases 1-5 before planning this phase. Each phase has pending human verification items in its VERIFICATION.md. UAT findings should inform test coverage priorities.
+
 **Goal**: Critical paths have automated test coverage to prevent regressions
-**Depends on**: Phase 4 (architecture stable for testing)
+**Depends on**: Phase 4 (architecture stable for testing), human UAT pass (Phases 1-5)
 **Requirements**: QUAL-06, QUAL-07, QUAL-08
 **Success Criteria** (what must be TRUE):
 
