@@ -149,6 +149,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Golden-path UAT in progress (4 passed, 2 issues, 14 pending). Three fixes applied during UAT. Two bugs remain before UAT can continue: (1) BLOCKER sidebar click unmounts ProjectPage killing transcription hook, (2) MAJOR progress bar not showing visual progress. Vite dev proxy plugin added (uncommitted) to bypass Netlify CLI edge function crash.
+Stopped at: Golden-path UAT — 9 fixes applied (Fixes 1-9 + stepper anchoring). 6 passed, 13 pending (including 4 retests of fixed bugs), 3 skipped. All fixes committed and pushed.
 Resume file: .planning/phases/00-golden-path/golden-path-UAT.md
-Resume action: Fix the two bugs in UAT gaps, then resume UAT from test 8. Use `npm run dev` for local testing (not `netlify dev`).
+Resume action: Clear localStorage, restart `npm run dev`, full retest starting from test 7. See UAT file for test-by-test expected behaviors.
