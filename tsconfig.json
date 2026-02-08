@@ -11,12 +11,13 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "strict": true,
     "noUncheckedIndexedAccess": true
   },
+  "include": ["src"],
   "exclude": ["netlify/edge-functions"]
 }

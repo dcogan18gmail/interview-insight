@@ -1,6 +1,6 @@
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { TranscriptSegment } from '../types';
-import { getDecryptedKey } from './cryptoService';
+import { TranscriptSegment } from '@/types';
+import { getDecryptedKey } from '@/services/cryptoService';
 
 /**
  * Create a GoogleGenAI client using the decrypted API key from localStorage.
@@ -196,12 +196,12 @@ export const generateTranscript = async (
       const isContinuation = allSegments.length > 0;
 
       const promptText = `
-        You are a professional transcriber and translator. 
-        
+        You are a professional transcriber and translator.
+
         INPUT METADATA:
         - Total Duration: ${Math.round(durationSeconds)} seconds.
         ${isContinuation ? `- RESUME FROM: ${Math.round(currentStartTime)} seconds.` : ''}
-        
+
         TASK:
         ${
           isContinuation
@@ -213,16 +213,16 @@ export const generateTranscript = async (
             `
             : `Transcribe the audio file from the beginning.`
         }
-        
+
         CRITICAL INSTRUCTIONS:
         - CONTINUOUS OUTPUT: Transcribe as much as possible in a single response. Do NOT stop after a few sentences. Aim to transcribe until the end of the file or until you hit the token limit.
         - IGNORE PAUSES: Do not stop generating if there is silence. Continue transcribing until the very end of the audio file.
         - FORMAT: JSON Lines (JSONL) only.
-        
+
         FORMATTING RULES:
         1. OUTPUT FORMAT: JSON Lines (JSONL). One object per line.
         2. GROUPING: Combine consecutive sentences by the same speaker into a single paragraph-sized segment.
-        3. FIELDS: 
+        3. FIELDS:
            - "speaker": Identify the speaker.
            - "originalText": The exact words spoken.
            - "englishText": The English translation.

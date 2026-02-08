@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { FileData } from '../types';
+import { FileData } from '@/types';
 
 interface FileUploadProps {
   onFileSelected: (fileData: FileData) => void;

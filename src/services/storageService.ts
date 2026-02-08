@@ -10,8 +10,11 @@ import type {
   Migration,
   ProjectStatus,
   FileInfo,
-} from './storageService.types';
-import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION } from './storageService.types';
+} from '@/services/storageService.types';
+import {
+  STORAGE_KEYS,
+  CURRENT_SCHEMA_VERSION,
+} from '@/services/storageService.types';
 
 const LOG_PREFIX = '[StorageService]';
 

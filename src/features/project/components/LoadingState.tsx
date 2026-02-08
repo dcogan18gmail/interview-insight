@@ -1,5 +1,5 @@
 import React from 'react';
-import { TranscriptSegment, TranscriptionStatus } from '../types';
+import { TranscriptSegment, TranscriptionStatus } from '@/types';
 
 interface LoadingStateProps {
   progress: number;

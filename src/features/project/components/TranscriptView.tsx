@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TranscriptSegment } from '../types';
+import { TranscriptSegment } from '@/types';
 import {
   Document,
   Packer,

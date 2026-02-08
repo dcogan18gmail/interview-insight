@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import FileUpload from './components/FileUpload';
-import TranscriptView from './components/TranscriptView';
-import LoadingState from './components/LoadingState';
-import Settings from './components/Settings';
-import { FileData, TranscriptSegment, TranscriptionStatus } from './types';
-import { generateTranscript, uploadFile } from './services/geminiService';
-import { hasStoredKey } from './services/cryptoService';
+import FileUpload from '@/features/project/components/FileUpload';
+import TranscriptView from '@/features/project/components/TranscriptView';
+import LoadingState from '@/features/project/components/LoadingState';
+import Settings from '@/features/settings/components/Settings';
+import { FileData, TranscriptSegment, TranscriptionStatus } from '@/types';
+import { generateTranscript, uploadFile } from '@/services/geminiService';
+import { hasStoredKey } from '@/services/cryptoService';
 
 const App: React.FC = () => {
   const [status, setStatus] = useState<TranscriptionStatus>(

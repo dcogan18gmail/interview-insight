@@ -5,7 +5,7 @@ import {
   getOrCreatePassphrase,
   hasStoredKey,
   clearStoredKey,
-} from '../services/cryptoService';
+} from '@/services/cryptoService';
 
 interface SettingsProps {
   onClose: () => void;

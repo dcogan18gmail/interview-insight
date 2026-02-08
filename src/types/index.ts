@@ -21,4 +21,5 @@ export interface FileData {
   file?: File; // New field for File API
   fileUri?: string; // New field for Gemini File URI
   duration: number; // Duration in seconds
+  durationUnknown?: boolean; // Flag for BUG-03: true when duration could not be determined
 }

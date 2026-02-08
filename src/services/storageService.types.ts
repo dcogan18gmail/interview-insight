@@ -1,7 +1,7 @@
 // Storage layer type definitions for localStorage persistence
 // All types for schema versioning, project metadata, transcript data, and safe I/O results
 
-import type { TranscriptSegment } from '../types';
+import type { TranscriptSegment } from '@/types';
 
 // --- Schema versioning ---
 
