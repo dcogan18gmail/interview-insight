@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-06)
 ## Current Position
 
 Phase: 6 of 9 (Enhanced Transcription Experience)
-Plan: 2 of 4
+Plan: 3 of 4
 Status: In progress
-Last activity: 2026-02-08 -- Completed 06-02-PLAN.md (Transcription Visual Layer)
+Last activity: 2026-02-08 -- Completed 06-03-PLAN.md (Integration Wiring)
 
-Progress: [███████████████░░░░░] ~50% (15 plans of ~30+ estimated total)
+Progress: [████████████████░░░░] ~53% (16 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 15
-- Average duration: ~3m 13s
-- Total execution time: ~0.80 hours
+- Total plans completed: 16
+- Average duration: ~3m 10s
+- Total execution time: ~0.84 hours
 
 **By Phase:**
 
@@ -33,12 +33,12 @@ Progress: [███████████████░░░░░] ~50% (1
 | 03-storage-foundation                | 2/2   | ~6m 10s  | ~3m 05s  |
 | 04-core-architecture-refactor        | 3/3   | ~14m 59s | ~5m 00s  |
 | 05-multi-project-dashboard           | 3/3   | ~8m 00s  | ~2m 40s  |
-| 06-enhanced-transcription-experience | 2/4   | ~7m 13s  | ~3m 37s  |
+| 06-enhanced-transcription-experience | 3/4   | ~9m 33s  | ~3m 11s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 05-02 (3m 00s), 05-03 (2m 00s), 06-01 (4m 01s), 06-02 (3m 12s)
-- Trend: Phase 6 visual layer complete; ProgressStepper and LiveTranscriptView ready for integration
+- Last 5 plans: 05-03 (2m 00s), 06-01 (4m 01s), 06-02 (3m 12s), 06-03 (2m 20s)
+- Trend: Phase 6 integration wiring complete; all 7 TRNS requirements connected end-to-end
 
 _Updated after each plan completion_
 
@@ -114,6 +114,9 @@ Recent decisions affecting current work:
 - useRef<HTMLDivElement>(null!) pattern for React 18 strict ref typing in useAutoScroll (06-02)
 - formatTimestampMmSs implemented locally in LiveTranscriptView rather than importing from docxExport (06-02)
 - SegmentRow as inline sub-component in LiveTranscriptView for cohesion (06-02)
+- CANCELLING and CANCELLED added to TranscriptionStatus enum for complete status mapping (06-03)
+- statusMap updated: cancelling/cancelled map to their own enum values, not aliased to PROCESSING/IDLE (06-03)
+- CenterPanel unchanged in 06-03: no status guards block cancelled projects from reaching TranscriptPanel (06-03)
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-08T16:09:02Z
-Stopped at: Completed 06-02-PLAN.md (Transcription Visual Layer) -- Phase 6 plan 2/4
-Resume file: .planning/phases/06-enhanced-transcription-experience/06-03-PLAN.md
+Last session: 2026-02-08T16:13:40Z
+Stopped at: Completed 06-03-PLAN.md (Integration Wiring) -- Phase 6 plan 3/4
+Resume file: .planning/phases/06-enhanced-transcription-experience/06-04-PLAN.md
