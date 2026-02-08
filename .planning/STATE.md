@@ -5,39 +5,40 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 5 - Multi-Project Dashboard
+**Current focus:** Phase 6 - Enhanced Transcription Experience
 
 ## Current Position
 
-Phase: 5 of 9 (Multi-Project Dashboard)
-Plan: 3 of 3
-Status: Phase complete
-Last activity: 2026-02-08 -- Completed 05-03-PLAN.md (Center Panel Content States and Editable Metadata)
+Phase: 6 of 9 (Enhanced Transcription Experience)
+Plan: 1 of 4
+Status: In progress
+Last activity: 2026-02-08 -- Completed 06-01-PLAN.md (Transcription Engine Cancel/Persistence)
 
-Progress: [█████████████░░░░░░░] ~43% (13 plans of ~30+ estimated total)
+Progress: [██████████████░░░░░░] ~47% (14 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13
-- Average duration: ~3m 09s
-- Total execution time: ~0.68 hours
+- Total plans completed: 14
+- Average duration: ~3m 13s
+- Total execution time: ~0.75 hours
 
 **By Phase:**
 
-| Phase                         | Plans | Total    | Avg/Plan |
-| ----------------------------- | ----- | -------- | -------- |
-| 01-security-hardening         | 3/3   | ~5m 29s  | ~1m 50s  |
-| 02-development-tooling        | 2/2   | ~7m 43s  | ~3m 52s  |
-| 03-storage-foundation         | 2/2   | ~6m 10s  | ~3m 05s  |
-| 04-core-architecture-refactor | 3/3   | ~14m 59s | ~5m 00s  |
-| 05-multi-project-dashboard    | 3/3   | ~8m 00s  | ~2m 40s  |
+| Phase                                | Plans | Total    | Avg/Plan |
+| ------------------------------------ | ----- | -------- | -------- |
+| 01-security-hardening                | 3/3   | ~5m 29s  | ~1m 50s  |
+| 02-development-tooling               | 2/2   | ~7m 43s  | ~3m 52s  |
+| 03-storage-foundation                | 2/2   | ~6m 10s  | ~3m 05s  |
+| 04-core-architecture-refactor        | 3/3   | ~14m 59s | ~5m 00s  |
+| 05-multi-project-dashboard           | 3/3   | ~8m 00s  | ~2m 40s  |
+| 06-enhanced-transcription-experience | 1/4   | ~4m 01s  | ~4m 01s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-03 (3m 24s), 05-01 (3m 00s), 05-02 (3m 00s), 05-03 (2m 00s)
-- Trend: Phase 5 complete; all 3 plans delivered, dashboard fully functional with editing
+- Last 5 plans: 05-01 (3m 00s), 05-02 (3m 00s), 05-03 (2m 00s), 06-01 (4m 01s)
+- Trend: Phase 6 started; engine layer (cancel, persistence, progress monotonicity) complete
 
 _Updated after each plan completion_
 
@@ -104,10 +105,16 @@ Recent decisions affecting current work:
 - Empty string edits convert to null to maintain needs-info indicator convention (05-03)
 - TranscriptPanel loads transcript synchronously from localStorage via getTranscript (05-03)
 - OnboardingView checks apiKeyConfigured from SettingsContext to mark step 1 as done (05-03)
+- AbortError explicitly re-thrown before retry logic in inner catch to prevent cancellation swallowed by retry mechanism (06-01)
+- Local accumulatedSegments array in startTranscription closure avoids stale machineState for CANCELLED dispatch (06-01)
+- PROGRESS reducer accumulates segments into transcript array for real-time persistence (06-01)
+- fileUri tracked in state machine via UPLOAD_COMPLETE event for resume-without-re-upload within 48h (06-01)
+- debouncedSaveTranscript uses existing debouncedWrite infrastructure (300ms) not a new timer (06-01)
+- cancel() dispatches CANCEL synchronously before abort() to prevent race conditions via TRANSITIONS map (06-01)
 
 ### Pending Todos
 
-- **Human UAT pass (Phases 1-5)** — Run `/gsd:verify-work` before Phase 8 (Testing Coverage). Each phase has a "Human Verification Required" section in its VERIFICATION.md with specific test scenarios. Phase 3 storage runtime tests (persistence, corruption recovery, quota, migration, debounced writes, orphan cleanup) were deferred pending app integration — now fully integrated. Do this before writing automated tests so UAT findings can inform test coverage.
+- **Human UAT pass (Phases 1-5)** -- Run `/gsd:verify-work` before Phase 8 (Testing Coverage). Each phase has a "Human Verification Required" section in its VERIFICATION.md with specific test scenarios. Phase 3 storage runtime tests (persistence, corruption recovery, quota, migration, debounced writes, orphan cleanup) were deferred pending app integration -- now fully integrated. Do this before writing automated tests so UAT findings can inform test coverage.
 
 ### Blockers/Concerns
 
@@ -120,12 +127,12 @@ Recent decisions affecting current work:
 
 - IndexedDB migration threshold: localStorage has ~5-10MB quota but exact limits vary by browser. Need to test with actual long transcripts to determine practical limits and migration trigger point.
 
-**Phase 6 (Transcription):**
+**Phase 6 (Transcription) -- PARTIALLY RESOLVED:**
 
-- Gemini API resumability: Need to verify whether Gemini's Files API supports resuming partial transcriptions mid-stream. If not supported, intermediate state persistence strategy may need adjustment.
+- ~~Gemini API resumability: Need to verify whether Gemini's Files API supports resuming partial transcriptions mid-stream.~~ Verified: AbortSignal is client-only, no server-side resume. File URIs persist 48h. Strategy: re-transcribe from scratch using persisted fileUri, skip re-upload.
 
 ## Session Continuity
 
-Last session: 2026-02-08T03:19:28Z
-Stopped at: Completed 05-03-PLAN.md (Center Panel Content States and Editable Metadata) -- Phase 5 complete (3/3)
-Resume file: Next phase (06) planning
+Last session: 2026-02-08T16:03:15Z
+Stopped at: Completed 06-01-PLAN.md (Transcription Engine Cancel/Persistence) -- Phase 6 plan 1/4
+Resume file: .planning/phases/06-enhanced-transcription-experience/06-02-PLAN.md
