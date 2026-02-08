@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Security Hardening** - BYOK model with encrypted storage, secure proxy, comprehensive headers
 - [x] **Phase 2: Development Tooling** - ESLint, Prettier, pre-commit hooks, TypeScript strict mode
 - [x] **Phase 3: Storage Foundation** - Versioned localStorage with migrations, quota handling, corruption recovery
-- [ ] **Phase 4: Core Architecture Refactor** - Decompose App.tsx into modules, extract hooks, fix memory leaks
+- [x] **Phase 4: Core Architecture Refactor** - Decompose App.tsx into modules, extract hooks, fix memory leaks
 - [ ] **Phase 5: Multi-Project Dashboard** - Project list UI, CRUD operations, navigation
 - [ ] **Phase 6: Enhanced Transcription Experience** - Full transcript visibility, cancel/retry, progress stages
 - [ ] **Phase 7: UI/UX Polish** - Loading states, error handling, accessibility, empty states
@@ -101,9 +101,9 @@ Plans:
 
 Plans:
 
-- [ ] 04-01-PLAN.md — Migrate to src/ directory, install deps, create SettingsContext and ProjectsContext
-- [ ] 04-02-PLAN.md — Extract docxExport service, refactor geminiService, create useTranscription hook, fix 3 bugs
-- [ ] 04-03-PLAN.md — Create React Router layout, page components, and wire complete transcription flow
+- [x] 04-01-PLAN.md — Migrate to src/ directory, install deps, create SettingsContext and ProjectsContext
+- [x] 04-02-PLAN.md — Extract docxExport service, refactor geminiService, create useTranscription hook, fix 3 bugs
+- [x] 04-03-PLAN.md — Create React Router layout, page components, and wire complete transcription flow
 
 ### Phase 5: Multi-Project Dashboard
 
@@ -205,7 +205,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Security Hardening                | 3/3            | Complete    | 2026-02-07 |
 | 2. Development Tooling               | 2/2            | Complete    | 2026-02-07 |
 | 3. Storage Foundation                | 2/2            | Complete    | 2026-02-07 |
-| 4. Core Architecture Refactor        | 0/TBD          | Not started | -          |
+| 4. Core Architecture Refactor        | 3/3            | Complete    | 2026-02-08 |
 | 5. Multi-Project Dashboard           | 0/TBD          | Not started | -          |
 | 6. Enhanced Transcription Experience | 0/TBD          | Not started | -          |
 | 7. UI/UX Polish                      | 0/TBD          | Not started | -          |
