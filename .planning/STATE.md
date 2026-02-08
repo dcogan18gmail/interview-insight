@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-06)
 
 **Core value:** Users can upload an interview recording and get a complete, structured transcript with translations and analysis -- with full visibility into the process.
-**Current focus:** Phase 6.1 in progress -- lifting transcription state to context provider
+**Current focus:** Phase 6.1 complete -- transcription state architecture fully implemented
 
 ## Current Position
 
 Phase: 6.1 of 9 (Transcription State Architecture)
-Plan: 1 of 3
-Status: Plan 01 complete
-Last activity: 2026-02-08 -- Plan 01 complete (TranscriptionContext provider, interrupted status, sonner)
+Plan: 3 of 3
+Status: Phase 6.1 complete
+Last activity: 2026-02-08 -- Plan 03 complete (sidebar indicators, interrupted UI, API key warning)
 
-Progress: [█████████████████░░░] ~56% (17 plans of ~30+ estimated total)
+Progress: [███████████████████░] ~63% (19 plans of ~30+ estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 17
-- Average duration: ~3m 07s
-- Total execution time: ~0.88 hours
+- Total plans completed: 19
+- Average duration: ~3m 08s
+- Total execution time: ~0.99 hours
 
 **By Phase:**
 
@@ -34,12 +34,12 @@ Progress: [█████████████████░░░] ~56% (1
 | 04-core-architecture-refactor         | 3/3   | ~14m 59s | ~5m 00s  |
 | 05-multi-project-dashboard            | 3/3   | ~8m 00s  | ~2m 40s  |
 | 06-enhanced-transcription-experience  | 3/3   | ~9m 33s  | ~3m 11s  |
-| 06.1-transcription-state-architecture | 1/3   | ~2m 34s  | ~2m 34s  |
+| 06.1-transcription-state-architecture | 3/3   | ~9m 11s  | ~3m 04s  |
 
 **Recent Trend:**
 
-- Last 5 plans: 06-01 (4m 01s), 06-02 (3m 12s), 06-03 (2m 20s), 06.1-01 (2m 34s)
-- Trend: Phase 6.1 started; TranscriptionContext provider created with split state/actions
+- Last 5 plans: 06-03 (2m 20s), 06.1-01 (2m 34s), 06.1-02 (3m 06s), 06.1-03 (3m 31s)
+- Trend: Phase 6.1 complete; sidebar indicators, interrupted UI, API key warning all implemented
 
 _Updated after each plan completion_
 
@@ -123,6 +123,15 @@ Recent decisions affecting current work:
 - Interrupt detection depends on projectsState.initialized to avoid race with ProjectsContext loading (06.1-01)
 - beforeunload handler additive with existing storageService handler, both idempotent (06.1-01)
 - SettingsProvider > ProjectsProvider > TranscriptionProvider > BrowserRouter nesting order in App.tsx (06.1-01)
+- useTranscription.ts gutted to 9-line thin re-export, all logic in TranscriptionContext (06.1-02)
+- ProjectPage uses reactive useEffect for completion/error/cancelled navigation instead of lifecycle sync (06.1-02)
+- Transcription-in-progress guard checks isTranscribing to block concurrent uploads with link to active project (06.1-02)
+- TranscriptionWatcher mounted in DashboardLayout, renderless component with ref-based transition detection (06.1-02)
+- Nav-away toast (3s), completion toast (8s clickable), error toast (persistent clickable) via sonner (06.1-02)
+- Sidebar indicators: animated spinner for active, orange pulse dot for interrupted, amber dot for cancelled/error (06.1-03)
+- Free navigation for all projects -- no blocking guard needed since transcription survives route changes via context (06.1-03)
+- Clear Key button disabled during active transcription; Save Key allowed with warning for fixing invalid keys (06.1-03)
+- Resume Transcription navigates to /project/new; fileUri-based resume deferred to future enhancement (06.1-03)
 
 ### Roadmap Evolution
 
@@ -159,6 +168,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 06.1-01-PLAN.md (TranscriptionContext provider, interrupted status, sonner). Plans 02 and 03 remain.
-Resume file: .planning/phases/06.1-transcription-state-architecture/06.1-01-SUMMARY.md
-Resume action: Execute Plan 02 (TranscriptionWatcher + sidebar indicators) then Plan 03 (ProjectPage refactor to consume context).
+Stopped at: Completed 06.1-03-PLAN.md -- Phase 6.1 complete (sidebar indicators, interrupted UI, API key warning)
+Resume file: .planning/phases/06.1-transcription-state-architecture/06.1-03-SUMMARY.md
+Resume action: Phase 6.1 complete. Proceed to next phase or resume golden-path UAT.
