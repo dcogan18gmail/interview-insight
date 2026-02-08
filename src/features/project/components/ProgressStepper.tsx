@@ -8,6 +8,7 @@ interface ProgressStepperProps {
   timeEstimate: string | null; // e.g., "~2 min remaining" or null if too early
   onCancel?: () => void; // Cancel button callback (optional -- hidden when not provided)
   isComplete?: boolean; // Triggers the completion transition
+  onFadeOutDone?: () => void; // Called when completion fade-out animation finishes
 }
 
 // --- Helpers ---
@@ -42,6 +43,7 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
   timeEstimate: timeEstimateProp,
   onCancel,
   isComplete = false,
+  onFadeOutDone,
 }) => {
   const startTimeRef = useRef(Date.now());
   const [completionFlash, setCompletionFlash] = useState(false);
@@ -68,9 +70,16 @@ const ProgressStepper: React.FC<ProgressStepperProps> = ({
         setCompletionFlash(false);
         setFadeOut(true);
       }, 1000);
-      return () => clearTimeout(flashTimer);
+      // Notify parent when fade-out animation completes (1s flash + 1s fade)
+      const doneTimer = setTimeout(() => {
+        onFadeOutDone?.();
+      }, 2000);
+      return () => {
+        clearTimeout(flashTimer);
+        clearTimeout(doneTimer);
+      };
     }
-  }, [isComplete, progress]);
+  }, [isComplete, progress, onFadeOutDone]);
 
   return (
     <div

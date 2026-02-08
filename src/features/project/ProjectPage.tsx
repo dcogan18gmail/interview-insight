@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranscription } from '@/features/project/hooks/useTranscription';
 import { useSettings } from '@/contexts/SettingsContext';
@@ -49,6 +49,10 @@ export default function ProjectPage() {
 
   // Cancel confirmation dialog state
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+  // Track whether ProgressStepper completion animation has finished
+  const [stepperDismissed, setStepperDismissed] = useState(false);
+  const handleStepperDone = useCallback(() => setStepperDismissed(true), []);
 
   // --- Existing project loading ---
   const existingProject =
@@ -185,6 +189,7 @@ export default function ProjectPage() {
   const handleReset = () => {
     reset();
     setCreatedProjectId(null);
+    setStepperDismissed(false);
     navigate('/project/new', { replace: true });
   };
 
@@ -240,11 +245,12 @@ export default function ProjectPage() {
       )}
 
       {/* Processing Stage: ProgressStepper + LiveTranscriptView */}
+      {/* Keep stepper visible during 'completed' until fade-out finishes */}
       {(machineState.state === 'uploading' ||
         machineState.state === 'processing' ||
-        machineState.state === 'cancelling') && (
+        machineState.state === 'cancelling' ||
+        (machineState.state === 'completed' && !stepperDismissed)) && (
         <div className="w-full">
-          {/* Progress stepper + bar (inline, scrolls away) */}
           <ProgressStepper
             currentStage={getProgressStage(
               machineState.state,
@@ -256,21 +262,25 @@ export default function ProjectPage() {
             )}
             timeEstimate={null}
             onCancel={
-              machineState.state !== 'cancelling'
+              machineState.state !== 'cancelling' &&
+              machineState.state !== 'completed'
                 ? handleCancelClick
                 : undefined
             }
-            isComplete={false}
+            isComplete={machineState.state === 'completed'}
+            onFadeOutDone={handleStepperDone}
           />
 
-          {/* Live transcript display */}
-          <div className="mt-4" style={{ maxHeight: 'calc(100vh - 250px)' }}>
-            <LiveTranscriptView
-              segments={machineState.transcript}
-              staleSegments={machineState.staleSegments}
-              isStreaming={machineState.state !== 'cancelling'}
-            />
-          </div>
+          {/* Live transcript display (hide once completed) */}
+          {machineState.state !== 'completed' && (
+            <div className="mt-4" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+              <LiveTranscriptView
+                segments={machineState.transcript}
+                staleSegments={machineState.staleSegments}
+                isStreaming={machineState.state !== 'cancelling'}
+              />
+            </div>
+          )}
         </div>
       )}
 
