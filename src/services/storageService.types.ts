@@ -27,7 +27,8 @@ export type ProjectStatus =
   | 'uploading'
   | 'processing'
   | 'completed'
-  | 'error';
+  | 'error'
+  | 'cancelled';
 
 export interface FileInfo {
   name: string;
@@ -59,6 +60,7 @@ export interface TranscriptData {
   projectId: string;
   segments: TranscriptSegment[];
   completedAt: string | null;
+  fileUri?: string; // Gemini file URI for resume-without-re-upload (valid 48h)
 }
 
 // --- Safe I/O result types ---

@@ -136,6 +136,7 @@ const VALID_PROJECT_STATUSES: ReadonlySet<ProjectStatus> = new Set([
   'processing',
   'completed',
   'error',
+  'cancelled',
 ]);
 
 /**
@@ -298,6 +299,9 @@ export function validateTranscriptData(
       projectId: obj['projectId'],
       segments: obj['segments'] as TranscriptData['segments'],
       completedAt: (obj['completedAt'] as string) ?? null,
+      ...(typeof obj['fileUri'] === 'string'
+        ? { fileUri: obj['fileUri'] }
+        : {}),
     },
   };
 }
@@ -636,6 +640,32 @@ export function saveTranscript(data: TranscriptData): WriteResult {
   }
 
   return result;
+}
+
+/**
+ * Debounced save of transcript data for partial persistence during streaming.
+ * Uses the existing debouncedWrite infrastructure (300ms batching) to avoid
+ * blocking the main thread with synchronous localStorage writes on every segment.
+ * Also queues a debounced update of the parent project's segmentCount.
+ */
+export function debouncedSaveTranscript(data: TranscriptData): void {
+  const serialized = JSON.stringify(data);
+  debouncedWrite(STORAGE_KEYS.transcript(data.projectId), serialized);
+
+  // Also debounce-update project metadata segmentCount
+  const projects = getProjects();
+  const projectIndex = projects.findIndex((p) => p.id === data.projectId);
+  if (projectIndex >= 0) {
+    const project = projects[projectIndex];
+    if (project) {
+      projects[projectIndex] = {
+        ...project,
+        segmentCount: data.segments.length,
+        updatedAt: new Date().toISOString(),
+      };
+      debouncedWrite(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+    }
+  }
 }
 
 /**

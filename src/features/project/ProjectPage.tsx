@@ -13,7 +13,12 @@ export default function ProjectPage() {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { state: settingsState } = useSettings();
-  const { machineState, startTranscription, reset } = useTranscription();
+  const {
+    machineState,
+    startTranscription,
+    cancel: _cancel,
+    reset,
+  } = useTranscription();
   const { state: projectsState, createProject, updateProject } = useProjects();
 
   const isNew = projectId === 'new';
@@ -55,7 +60,12 @@ export default function ProjectPage() {
       navigate(`/project/${project.id}`, { replace: true });
     }
 
-    startTranscription(fileData.file, fileData.type, fileData.duration);
+    startTranscription(
+      fileData.file,
+      fileData.type,
+      fileData.duration,
+      project.id
+    );
   };
 
   // --- Update project status through transcription lifecycle ---
@@ -85,6 +95,11 @@ export default function ProjectPage() {
       updateProject({ ...project, status: 'completed' });
     } else if (machineState.state === 'error' && project.status !== 'error') {
       updateProject({ ...project, status: 'error' });
+    } else if (
+      machineState.state === 'cancelled' &&
+      project.status !== 'cancelled'
+    ) {
+      updateProject({ ...project, status: 'cancelled' });
     }
   }, [
     machineState.state,
@@ -95,10 +110,13 @@ export default function ProjectPage() {
   ]);
 
   // Map hook state names to the TranscriptionStatus enum used by LoadingState
+  // cancelling/cancelled map to PROCESSING/ERROR for display purposes
   const statusMap: Record<string, TranscriptionStatus> = {
     idle: TranscriptionStatus.IDLE,
     uploading: TranscriptionStatus.UPLOADING,
     processing: TranscriptionStatus.PROCESSING,
+    cancelling: TranscriptionStatus.PROCESSING,
+    cancelled: TranscriptionStatus.IDLE,
     completed: TranscriptionStatus.COMPLETED,
     error: TranscriptionStatus.ERROR,
   };

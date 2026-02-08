@@ -111,6 +111,7 @@ function StatusBadge({ status }: { status: ProjectMetadata['status'] }) {
     uploading: 'bg-blue-100 text-blue-700',
     processing: 'bg-blue-100 text-blue-700',
     idle: 'bg-slate-100 text-slate-600',
+    cancelled: 'bg-amber-100 text-amber-700',
   };
 
   return (
