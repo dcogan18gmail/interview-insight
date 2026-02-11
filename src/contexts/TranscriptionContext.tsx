@@ -216,6 +216,12 @@ export function TranscriptionProvider({
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const { state: projectsState, updateProject } = useProjects();
 
+  // Ref to track latest projects list -- avoids stale closure in startTranscription
+  const projectsRef = useRef(projectsState.projects);
+  useEffect(() => {
+    projectsRef.current = projectsState.projects;
+  }, [projectsState.projects]);
+
   // Derive isTranscribing from machine state
   const isTranscribing = ['uploading', 'processing', 'cancelling'].includes(
     machineState.state
@@ -266,7 +272,7 @@ export function TranscriptionProvider({
       dispatch({ type: 'START' });
 
       // Update project status to uploading
-      const project = projectsState.projects.find((p) => p.id === projectId);
+      const project = projectsRef.current.find((p) => p.id === projectId);
       if (project) {
         updateProject({ ...project, status: 'uploading' });
       }
@@ -296,7 +302,7 @@ export function TranscriptionProvider({
         dispatch({ type: 'UPLOAD_COMPLETE', fileUri });
 
         // Update project status to processing
-        const currentProject = projectsState.projects.find(
+        const currentProject = projectsRef.current.find(
           (p) => p.id === projectId
         );
         if (currentProject) {
@@ -343,7 +349,7 @@ export function TranscriptionProvider({
           transcript.length > 0
             ? Math.max(...transcript.map((s) => s.timestamp ?? 0))
             : 0;
-        const completedProject = projectsState.projects.find(
+        const completedProject = projectsRef.current.find(
           (p) => p.id === projectId
         );
         if (completedProject) {
@@ -372,7 +378,7 @@ export function TranscriptionProvider({
           flushPendingWrites();
 
           // Update project status to cancelled
-          const cancelledProject = projectsState.projects.find(
+          const cancelledProject = projectsRef.current.find(
             (p) => p.id === projectId
           );
           if (cancelledProject) {
@@ -392,7 +398,7 @@ export function TranscriptionProvider({
         dispatch({ type: 'ERROR', error: message });
 
         // Update project status to error
-        const errorProject = projectsState.projects.find(
+        const errorProject = projectsRef.current.find(
           (p) => p.id === projectId
         );
         if (errorProject) {
