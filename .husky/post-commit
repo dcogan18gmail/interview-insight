@@ -1,0 +1,2 @@
+# Auto-push to origin after every commit
+git push origin master 2>/dev/null &

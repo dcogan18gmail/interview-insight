@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Skill(gsd:map-codebase)"
+      "Skill(gsd:map-codebase)",
+      "Bash(git check-ignore:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "Skill(gsd:plan-phase)"
     ]
   }
 }
